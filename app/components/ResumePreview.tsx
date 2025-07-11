@@ -28,7 +28,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
         {/* Terminal Header */}
         <div className="mb-8">
           <div className="flex items-center gap-6 mb-4">
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               {data.avatar ? (
                 <img 
                   src={data.avatar} 

@@ -1,5 +1,7 @@
 import './globals.css'
 import React from 'react'
+import { ThemeProvider } from './components/ThemeProvider'
+import { ThemeToggle } from './components/ThemeToggle'
 
 export const metadata = {
   title: 'Code Style CV Generator',
@@ -12,8 +14,18 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className="font-mono">{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className="font-mono">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ThemeToggle />
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   )
 } 

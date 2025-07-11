@@ -115,6 +115,129 @@
   .resume-container .accent {
     color: #4fd1c7;
   }
+
+  /* Rich text editor styles */
+  .rich-text-editor .ql-editor {
+    font-family: 'Monaco', 'Menlo', monospace !important;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    min-height: 100px;
+    font-size: 14px;
+  }
+
+  .rich-text-editor .ql-toolbar {
+    font-family: 'Monaco', 'Menlo', monospace !important;
+    border: 1px solid #d1d5db;
+    border-bottom: 1px solid #d1d5db;
+  }
+
+  .rich-text-editor .ql-container {
+    border: 1px solid #d1d5db;
+    border-top: none;
+  }
+
+  .rich-text-editor .ql-editor p {
+    margin: 0;
+  }
+
+  .rich-text-editor .ql-editor.ql-blank::before {
+    font-family: 'Monaco', 'Menlo', monospace !important;
+    font-style: normal;
+    color: #9ca3af;
+  }
+
+  /* Rich text editor indent support */
+  .rich-text-editor .ql-indent-1 {
+    padding-left: 2em;
+  }
+
+  .rich-text-editor .ql-indent-2 {
+    padding-left: 4em;
+  }
+
+  .rich-text-editor .ql-indent-3 {
+    padding-left: 6em;
+  }
+
+  .rich-text-editor .ql-indent-4 {
+    padding-left: 8em;
+  }
+
+  .rich-text-editor .ql-indent-5 {
+    padding-left: 10em;
+  }
+
+  /* Rich text editor link styles */
+  .rich-text-editor .ql-editor a {
+    color: #3b82f6;
+    text-decoration: underline;
+  }
+
+  .rich-text-editor .ql-editor a:hover {
+    color: #1d4ed8;
+  }
+
+  /* Resume preview rich text styles */
+  .resume-rich-text {
+    font-family: 'Monaco', 'Menlo', monospace;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+  }
+
+  .resume-rich-text strong {
+    font-weight: bold;
+  }
+
+  .resume-rich-text em {
+    font-style: italic;
+  }
+
+  .resume-rich-text br {
+    display: block;
+    content: "";
+    margin: 0.25rem 0;
+  }
+
+  .resume-rich-text p {
+    margin: 0;
+    padding: 0;
+  }
+
+  .resume-rich-text p:not(:first-child) {
+    margin-top: 0.5rem;
+  }
+
+  /* Resume preview indent support */
+  .resume-rich-text .ql-indent-1 {
+    padding-left: 2em;
+  }
+
+  .resume-rich-text .ql-indent-2 {
+    padding-left: 4em;
+  }
+
+  .resume-rich-text .ql-indent-3 {
+    padding-left: 6em;
+  }
+
+  .resume-rich-text .ql-indent-4 {
+    padding-left: 8em;
+  }
+
+  .resume-rich-text .ql-indent-5 {
+    padding-left: 10em;
+  }
+
+  /* Resume preview link styles */
+  .resume-rich-text a {
+    color: #3b82f6;
+    text-decoration: underline;
+  }
+
+  .resume-rich-text a:hover {
+    color: #1d4ed8;
+  }
 }
 
 @layer base {

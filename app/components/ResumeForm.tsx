@@ -9,7 +9,10 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Separator } from '@/components/ui/separator'
-import { Camera, User } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Camera, User, Plus, X } from 'lucide-react'
+import RichTextEditor from './RichTextEditor'
 
 interface ResumeFormProps {
   data: ResumeData
@@ -53,6 +56,10 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
     setFormData(prev => ({ ...prev, [field]: value }))
   }, [])
 
+  const handleBooleanChange = useCallback((field: string, value: boolean) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }, [])
+
   const handleWorkExperienceChange = useCallback((index: number, field: string, value: string) => {
     setFormData(prev => {
       const newWorkExperience = [...prev.workExperience]
@@ -61,16 +68,22 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
     })
   }, [])
 
-  const handleEducationChange = useCallback((index: number, field: string, value: string) => {
+  const handleCustomSectionChange = useCallback((sectionIndex: number, field: string, value: string) => {
     setFormData(prev => {
-      const newEducation = [...prev.education]
-      newEducation[index] = { ...newEducation[index], [field]: value }
-      return { ...prev, education: newEducation }
+      const newCustomSections = [...prev.customSections]
+      newCustomSections[sectionIndex] = { ...newCustomSections[sectionIndex], [field]: value }
+      return { ...prev, customSections: newCustomSections }
     })
   }, [])
 
-  const handleSkillsChange = useCallback((category: string, value: string) => {
-    setFormData(prev => ({ ...prev, skills: { ...prev.skills, [category]: value } }))
+  const handleCustomSectionItemChange = useCallback((sectionIndex: number, itemIndex: number, field: string, value: string) => {
+    setFormData(prev => {
+      const newCustomSections = [...prev.customSections]
+      const newItems = [...newCustomSections[sectionIndex].items]
+      newItems[itemIndex] = { ...newItems[itemIndex], [field]: value }
+      newCustomSections[sectionIndex] = { ...newCustomSections[sectionIndex], items: newItems }
+      return { ...prev, customSections: newCustomSections }
+    })
   }, [])
 
   const addWorkExperience = useCallback(() => {
@@ -90,21 +103,43 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
     }))
   }, [])
 
-  const addEducation = useCallback(() => {
+  const addCustomSection = useCallback(() => {
     setFormData(prev => ({
       ...prev,
-      education: [
-        ...prev.education,
-        { degree: '', school: '', period: '' }
+      customSections: [
+        ...prev.customSections,
+        { id: Date.now().toString(), title: '', items: [{ id: Date.now().toString(), title: '', description: '', period: '' }] }
       ]
     }))
   }, [])
 
-  const removeEducation = useCallback((index: number) => {
+  const removeCustomSection = useCallback((index: number) => {
     setFormData(prev => ({
       ...prev,
-      education: prev.education.filter((_, i) => i !== index)
+      customSections: prev.customSections.filter((_, i) => i !== index)
     }))
+  }, [])
+
+  const addCustomSectionItem = useCallback((sectionIndex: number) => {
+    setFormData(prev => {
+      const newCustomSections = [...prev.customSections]
+      newCustomSections[sectionIndex] = {
+        ...newCustomSections[sectionIndex],
+        items: [...newCustomSections[sectionIndex].items, { id: Date.now().toString(), title: '', description: '', period: '' }]
+      }
+      return { ...prev, customSections: newCustomSections }
+    })
+  }, [])
+
+  const removeCustomSectionItem = useCallback((sectionIndex: number, itemIndex: number) => {
+    setFormData(prev => {
+      const newCustomSections = [...prev.customSections]
+      newCustomSections[sectionIndex] = {
+        ...newCustomSections[sectionIndex],
+        items: newCustomSections[sectionIndex].items.filter((_, i) => i !== itemIndex)
+      }
+      return { ...prev, customSections: newCustomSections }
+    })
   }, [])
 
   const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,11 +170,10 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
       )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="personal">Personal</TabsTrigger>
           <TabsTrigger value="work">Work</TabsTrigger>
-          <TabsTrigger value="skills">Skills</TabsTrigger>
-          <TabsTrigger value="education">Education</TabsTrigger>
+          <TabsTrigger value="custom">Right Side Sections</TabsTrigger>
         </TabsList>
 
         <div className="mt-6">
@@ -149,7 +183,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                 <Label htmlFor="profile-picture">Profile Picture</Label>
                 <div className="mt-2 flex items-center space-x-4">
                   <div className="relative">
-                    <div className="w-24 h-24 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
+                    <div className="w-16 h-16 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
                       {formData.avatar ? (
                         <img 
                           src={formData.avatar} 
@@ -157,7 +191,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <User className="w-8 h-8 text-gray-400" />
+                        <User className="w-6 h-6 text-gray-400" />
                       )}
                     </div>
                     <label 
@@ -188,7 +222,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                   id="full-name"
                   type="text"
                   value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('name', e.target.value)}
                   className="mt-2"
                   placeholder="Enter your full name"
                 />
@@ -199,21 +233,64 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                   id="professional-title"
                   type="text"
                   value={formData.title}
-                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('title', e.target.value)}
                   className="mt-2"
                   placeholder="e.g., Senior Software Engineer"
                 />
               </div>
               <div>
-                <Label htmlFor="summary">Summary</Label>
-                <Textarea
-                  id="summary"
-                  value={formData.summary}
-                  onChange={(e) => handleInputChange('summary', e.target.value)}
-                  rows={4}
+                <Label htmlFor="location">Location</Label>
+                <Input
+                  id="location"
+                  type="text"
+                  value={formData.location}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('location', e.target.value)}
                   className="mt-2"
-                  placeholder="Write a brief summary of your experience and skills"
+                  placeholder="e.g., San Francisco, CA"
                 />
+              </div>
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('email', e.target.value)}
+                  className="mt-2"
+                  placeholder="your.email@example.com"
+                />
+              </div>
+              <div>
+                <Label htmlFor="website">Website</Label>
+                <Input
+                  id="website"
+                  type="url"
+                  value={formData.website}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('website', e.target.value)}
+                  className="mt-2"
+                  placeholder="https://yourwebsite.com"
+                />
+              </div>
+              <div>
+                <Label htmlFor="summary">Summary</Label>
+                <div className="mt-2">
+                  <RichTextEditor
+                    value={formData.summary}
+                    onChange={(value) => handleInputChange('summary', value)}
+                    placeholder="Write a brief summary of your experience and skills. Use the toolbar to format your text."
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="show-copyright"
+                  checked={formData.showCopyright}
+                  onCheckedChange={(checked) => handleBooleanChange('showCopyright', checked === true)}
+                />
+                <Label htmlFor="show-copyright" className="text-sm font-normal">
+                  Show copyright watermark next to &lt;CV&gt; text
+                </Label>
               </div>
             </div>
           </TabsContent>
@@ -283,14 +360,13 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                       </div>
                       <div className="col-span-2">
                         <Label htmlFor={`description-${index}`}>Description</Label>
-                        <Textarea
-                          id={`description-${index}`}
-                          value={exp.description}
-                          onChange={(e) => handleWorkExperienceChange(index, 'description', e.target.value)}
-                          rows={3}
-                          className="mt-1"
-                          placeholder="Describe your role and achievements"
-                        />
+                        <div className="mt-1">
+                          <RichTextEditor
+                            value={exp.description}
+                            onChange={(value) => handleWorkExperienceChange(index, 'description', value)}
+                            placeholder="Describe your role and achievements. Use the toolbar to format your text."
+                          />
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -299,88 +375,108 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
             </div>
           </TabsContent>
 
-          <TabsContent value="skills" className="space-y-4">
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">Skills</h3>
-              {Object.entries(formData.skills).map(([category, skills]) => (
-                <div key={category}>
-                  <Label htmlFor={`skills-${category}`}>{category}</Label>
-                  <Textarea
-                    id={`skills-${category}`}
-                    value={skills}
-                    onChange={(e) => handleSkillsChange(category, e.target.value)}
-                    rows={3}
-                    className="mt-2"
-                    placeholder="Enter skills separated by commas"
-                  />
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="education" className="space-y-6">
+          <TabsContent value="custom" className="space-y-6">
             <div className="space-y-6">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium">Education</h3>
+                <h3 className="text-lg font-medium">Right Side Sections</h3>
                 <Button
                   type="button"
-                  onClick={addEducation}
+                  onClick={addCustomSection}
                   variant="outline"
                   size="sm"
                 >
-                  Add Education
+                  Add Section
                 </Button>
               </div>
-              {formData.education.map((edu, index) => (
-                <Card key={index}>
+              {formData.customSections.map((section, sectionIndex) => (
+                <Card key={section.id}>
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
-                      <CardTitle className="text-base">Education {index + 1}</CardTitle>
+                      <CardTitle className="text-base">Section {sectionIndex + 1}</CardTitle>
                       <Button
                         type="button"
-                        onClick={() => removeEducation(index)}
+                        onClick={() => removeCustomSection(sectionIndex)}
                         variant="destructive"
                         size="sm"
                       >
-                        Remove
+                        Remove Section
                       </Button>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor={`degree-${index}`}>Degree</Label>
-                        <Input
-                          id={`degree-${index}`}
-                          type="text"
-                          value={edu.degree}
-                          onChange={(e) => handleEducationChange(index, 'degree', e.target.value)}
-                          className="mt-1"
-                          placeholder="e.g., Bachelor's in Computer Science"
-                        />
+                    <div>
+                      <Label htmlFor={`section-title-${sectionIndex}`}>Section Title</Label>
+                      <Input
+                        id={`section-title-${sectionIndex}`}
+                        type="text"
+                        value={section.title}
+                        onChange={(e) => handleCustomSectionChange(sectionIndex, 'title', e.target.value)}
+                        className="mt-1"
+                        placeholder="e.g., Awards, Certifications, etc."
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <Label>Items</Label>
+                        <Button
+                          type="button"
+                          onClick={() => addCustomSectionItem(sectionIndex)}
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Add Item
+                        </Button>
                       </div>
-                      <div>
-                        <Label htmlFor={`school-${index}`}>School</Label>
-                        <Input
-                          id={`school-${index}`}
-                          type="text"
-                          value={edu.school}
-                          onChange={(e) => handleEducationChange(index, 'school', e.target.value)}
-                          className="mt-1"
-                          placeholder="University name"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor={`edu-period-${index}`}>Period</Label>
-                        <Input
-                          id={`edu-period-${index}`}
-                          type="text"
-                          value={edu.period}
-                          onChange={(e) => handleEducationChange(index, 'period', e.target.value)}
-                          className="mt-1"
-                          placeholder="e.g., 2018-2022"
-                        />
-                      </div>
+                      {section.items.map((item, itemIndex) => (
+                        <div key={item.id} className="border rounded-lg p-4 space-y-3">
+                          <div className="flex justify-between items-start">
+                            <h4 className="text-sm font-medium text-gray-700">Item {itemIndex + 1}</h4>
+                            <Button
+                              type="button"
+                              onClick={() => removeCustomSectionItem(sectionIndex, itemIndex)}
+                              variant="destructive"
+                              size="sm"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor={`item-title-${sectionIndex}-${itemIndex}`}>Title</Label>
+                              <Input
+                                id={`item-title-${sectionIndex}-${itemIndex}`}
+                                type="text"
+                                value={item.title}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleCustomSectionItemChange(sectionIndex, itemIndex, 'title', e.target.value)}
+                                placeholder="e.g., Award Name"
+                                className="mt-1"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor={`item-period-${sectionIndex}-${itemIndex}`}>Period</Label>
+                              <Input
+                                id={`item-period-${sectionIndex}-${itemIndex}`}
+                                type="text"
+                                value={item.period}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleCustomSectionItemChange(sectionIndex, itemIndex, 'period', e.target.value)}
+                                placeholder="e.g., 2023"
+                                className="mt-1"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <Label htmlFor={`item-description-${sectionIndex}-${itemIndex}`}>Description</Label>
+                            <div className="mt-1">
+                              <RichTextEditor
+                                value={item.description}
+                                onChange={(value) => handleCustomSectionItemChange(sectionIndex, itemIndex, 'description', value)}
+                                placeholder="Enter item description. Use the toolbar to format your text."
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </CardContent>
                 </Card>

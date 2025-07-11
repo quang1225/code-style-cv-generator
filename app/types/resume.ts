@@ -1,25 +1,26 @@
 export interface ResumeData {
   name: string
   title: string
+  location: string
+  email: string
+  website: string
   avatar?: string
   summary: string
+  showCopyright: boolean
   workExperience: {
     position: string
     company: string
     period: string
     description: string
   }[]
-  skills: {
-    [key: string]: string
-  }
-  education: {
-    degree: string
-    school: string
-    period: string
-  }[]
-  professionalDevelopment: {
+  customSections: {
+    id: string
     title: string
-    organization: string
-    period: string
+    items: {
+      id: string
+      title: string
+      description: string
+      period: string
+    }[]
   }[]
 } 

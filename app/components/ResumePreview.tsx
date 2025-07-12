@@ -71,9 +71,9 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
           boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
         }}
       >
-        {/* Copyright text at top left border */}
+        {/* Copyright text at top right border */}
         {data.showCopyright && (
-          <div className="absolute top-2 left-2 text-[10px] text-gray-600 font-normal whitespace-nowrap z-10">
+          <div className="absolute top-2 right-2 text-[10px] text-gray-600 font-normal whitespace-nowrap z-10">
             CV made with{" "}
             <a
               href="https://code-style-cv-generator.quang.work/"

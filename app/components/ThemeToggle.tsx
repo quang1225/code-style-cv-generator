@@ -52,7 +52,7 @@ export function ThemeToggle() {
     overlay.style.background = newTheme === 'dark' ? '#0a0a0a' : '#ffffff'
     overlay.style.clipPath = `circle(0px at ${x}px ${y}px)`
     overlay.style.opacity = '1'
-    overlay.style.transition = 'clip-path 0.3s ease-out'
+          overlay.style.transition = 'clip-path 0.5s ease-out'
     
     // Use requestAnimationFrame for maximum performance
     requestAnimationFrame(() => {
@@ -72,12 +72,12 @@ export function ThemeToggle() {
     setTimeout(() => {
       if (overlay) {
         overlay.style.opacity = '0'
-        overlay.style.transition = 'opacity 0.1s ease-out'
+        overlay.style.transition = 'opacity 0.15s ease-out'
       }
       setTimeout(() => {
         setIsAnimating(false)
-      }, 100)
-    }, 300)
+      }, 150)
+    }, 500)
   }, [isAnimating, setTheme])
 
   const handleThemeToggle = useCallback(async (event: React.MouseEvent) => {
@@ -141,15 +141,19 @@ export function ThemeToggle() {
       size="icon"
       onClick={handleThemeToggle}
       disabled={isAnimating}
-      className={`fixed top-4 right-4 z-50 bg-background border-border hover:bg-accent hover:text-accent-foreground transition-all duration-150 ease-out will-change-transform ${
-        isAnimating ? 'scale-95' : 'hover:scale-105 active:scale-95'
+      className={`fixed top-4 right-4 z-50 bg-background border-border hover:bg-accent hover:text-accent-foreground transition-all duration-200 ease-out will-change-transform hover:shadow-lg ${
+        isAnimating ? 'scale-90 shadow-md' : 'hover:scale-110 active:scale-95'
       }`}
       title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
     >
       {theme === 'light' ? (
-        <Moon className="h-[1.2rem] w-[1.2rem] transition-all duration-150 ease-out will-change-transform" />
+        <Moon className={`h-[1.2rem] w-[1.2rem] transition-all duration-200 ease-out will-change-transform ${
+          isAnimating ? 'rotate-12 scale-110' : 'hover:rotate-6'
+        }`} />
       ) : (
-        <Sun className="h-[1.2rem] w-[1.2rem] transition-all duration-150 ease-out will-change-transform" />
+        <Sun className={`h-[1.2rem] w-[1.2rem] transition-all duration-200 ease-out will-change-transform ${
+          isAnimating ? 'rotate-12 scale-110' : 'hover:rotate-6'
+        }`} />
       )}
       <span className="sr-only">Toggle theme</span>
     </Button>

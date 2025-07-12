@@ -2,7 +2,6 @@
 
 import React, { useRef, useEffect, useState } from 'react'
 import { ResumeData } from '../types/resume'
-import { Mail, Globe } from 'lucide-react'
 
 interface ResumePreviewProps {
   data: ResumeData
@@ -65,7 +64,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                   />
                 ) : (
                   <div className="w-16 h-16 rounded-full bg-gray-600 border-2 border-green-400 flex items-center justify-center">
-                    <span className="text-green-400 text-lg">👤</span>
                   </div>
                 )}
               </div>
@@ -93,14 +91,12 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
               </div>
               <div className="text-left text-xs text-gray-300 space-y-1">
                 {data.email && (
-                  <div className="flex items-center gap-1">
-                    <Mail className="w-3 h-3" />
+                  <div>
                     <span>Email: {data.email}</span>
                   </div>
                 )}
                 {data.website && (
-                  <div className="flex items-center gap-1">
-                    <Globe className="w-3 h-3" />
+                  <div>
                     <span>Website: </span>
                     <a 
                       href={data.website} 
@@ -133,7 +129,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                 {/* Summary */}
                 <section>
                   <h2 className="text-orange-400 text-base font-bold mb-3">/summary</h2>
-                  <p className="text-gray-300 leading-relaxed text-xs">{formatText(data.summary)}</p>
+                  <div className="text-gray-300 leading-relaxed text-xs">{formatText(data.summary)}</div>
                 </section>
 
                 {/* Work Experience */}
@@ -149,7 +145,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                           </div>
                           <p className="text-gray-400 text-sm">{job.company}</p>
                         </div>
-                        <p className="text-gray-300 text-xs leading-relaxed">{formatText(job.description)}</p>
+                        <div className="text-gray-300 text-xs leading-relaxed">{formatText(job.description)}</div>
                       </div>
                     ))}
                   </div>
@@ -171,7 +167,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                               {item.period && <span className="text-green-400 font-bold text-sm">{item.period}</span>}
                             </div>
                           </div>
-                          {item.description && <p className="text-gray-300 text-xs leading-relaxed">{formatText(item.description)}</p>}
+                          {item.description && <div className="text-gray-300 text-xs leading-relaxed">{formatText(item.description)}</div>}
                         </div>
                       ))}
                     </div>

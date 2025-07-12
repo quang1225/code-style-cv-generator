@@ -461,4 +461,154 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Maximum performance View Transitions API - No content fade animations */
+@supports (view-transition-name: root) {
+  /* Smooth circular reveal animation */
+  @keyframes circular-reveal {
+    0% {
+      clip-path: circle(0px at var(--theme-toggle-x, 50%) var(--theme-toggle-y, 50%));
+    }
+    100% {
+      clip-path: circle(100vmax at var(--theme-toggle-x, 50%) var(--theme-toggle-y, 50%));
+    }
+  }
+  
+  /* Maximum performance transition properties */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+    will-change: clip-path;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+  }
+  
+  /* Smooth circular reveal */
+  ::view-transition-new(root) {
+    animation: circular-reveal 0.3s ease-out;
+    z-index: 2;
+  }
+  
+  /* Static old content for instant switching */
+  ::view-transition-old(root) {
+    z-index: 1;
+    opacity: 1;
+  }
+  
+  /* Enable view transitions */
+  html {
+    view-transition-name: root;
+  }
+}
+
+/* Optimized fallback styles - No content fade animations for maximum performance */
+@media (prefers-reduced-motion: no-preference) {
+  /* Disable all automatic theme transitions on content elements */
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+  }
+  
+  /* Only allow transitions on interactive elements that need them */
+  button,
+  .button,
+  [role="button"],
+  a,
+  input,
+  textarea,
+  select {
+    transition: 
+      background-color 0.1s ease-out,
+      border-color 0.1s ease-out,
+      color 0.1s ease-out,
+      transform 0.1s ease-out,
+      opacity 0.1s ease-out !important;
+  }
+  
+
+  
+  /* Exception: Allow smooth-expand animations to work */
+  .smooth-expand {
+    transition:
+      width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+      transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+      box-shadow 0.4s ease-out !important;
+  }
+  
+  .smooth-expand:hover {
+    transition:
+      width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.5s ease-out !important;
+  }
+  
+  /* Exception: Allow important UI animations */
+  [class*="hover:shadow"],
+  [class*="hover:scale"],
+  [class*="hover:bg-"],
+  [class*="hover:text-"] {
+    transition:
+      box-shadow 0.2s ease-out,
+      transform 0.2s ease-out,
+      background-color 0.1s ease-out,
+      color 0.1s ease-out !important;
+  }
+  
+  /* Exception: Allow width transitions for layout elements */
+  [class*="w-["],
+  [class*="peer-hover:w-"] {
+    transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  }
+}
+
+/* Ensure cursor pointer for interactive elements (always applied) */
+button,
+.button,
+[role="button"],
+[role="tab"],
+[role="checkbox"],
+[role="radio"],
+[role="switch"],
+a,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="checkbox"],
+input[type="radio"],
+label,
+.cursor-pointer,
+[data-state="unchecked"],
+[data-state="checked"],
+[tabindex]:not([tabindex="-1"]) {
+  cursor: pointer !important;
+}
+
+/* Specific cursor styles for form elements */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+input[type="tel"],
+input[type="number"],
+textarea {
+  cursor: text !important;
+}
+
+/* Select elements should have pointer cursor */
+select {
+  cursor: pointer !important;
+}
+
+/* Radix UI components cursor fix */
+[data-radix-collection-item],
+[data-radix-select-trigger],
+[data-radix-tabs-trigger],
+[data-radix-checkbox-root],
+[data-radix-radio-root],
+[data-radix-switch-root] {
+  cursor: pointer !important;
 } 

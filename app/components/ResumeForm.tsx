@@ -169,6 +169,17 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
         </div>
       )}
 
+      <div className="flex items-center space-x-2 mb-4">
+        <Checkbox
+          id="show-copyright"
+          checked={formData.showCopyright}
+          onCheckedChange={(checked) => handleBooleanChange('showCopyright', checked === true)}
+        />
+        <Label htmlFor="show-copyright" className="text-sm font-normal">
+          Show watermark
+        </Label>
+      </div>
+
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="personal">Personal</TabsTrigger>
@@ -281,16 +292,6 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                     className="mt-1"
                   />
                 </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="show-copyright"
-                  checked={formData.showCopyright}
-                  onCheckedChange={(checked) => handleBooleanChange('showCopyright', checked === true)}
-                />
-                <Label htmlFor="show-copyright" className="text-sm font-normal">
-                  Show copyright watermark next to &lt;CV&gt; text
-                </Label>
               </div>
             </div>
           </TabsContent>

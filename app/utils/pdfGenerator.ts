@@ -388,9 +388,21 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
     } else {
       // Content needs multiple pages - use full page height, no white space
       const pageHeight = pdfHeight
-      const totalPages = Math.ceil(scaledHeight / pageHeight)
       
-      console.log(`Content requires ${totalPages} pages`)
+      // Calculate how much original canvas height fits in one PDF page
+      const originalHeightPerPage = canvas.height / (scaledHeight / pageHeight)
+      
+      // Calculate total pages more accurately - only create pages that have substantial content
+      const minContentHeight = 50 // Minimum content height to warrant a new page
+      let totalPages = Math.floor(canvas.height / originalHeightPerPage)
+      const remainder = canvas.height % originalHeightPerPage
+      
+      // Only add an extra page if there's substantial remaining content
+      if (remainder > minContentHeight) {
+        totalPages += 1
+      }
+      
+      console.log(`Content requires ${totalPages} pages (originalHeightPerPage: ${originalHeightPerPage.toFixed(1)}px, remainder: ${remainder.toFixed(1)}px)`)
       
       // Create a temporary canvas for each page
       const tempCanvas = document.createElement('canvas')
@@ -399,10 +411,6 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
       if (!tempCtx) {
         throw new Error('Could not create temporary canvas context')
       }
-      
-      // Use a simpler, more reliable approach
-      // Calculate how much original canvas height fits in one PDF page
-      const originalHeightPerPage = canvas.height / (scaledHeight / pageHeight)
       
       for (let page = 0; page < totalPages; page++) {
         if (page > 0) {
@@ -413,20 +421,20 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
         const sourceY = page * originalHeightPerPage
         const isLastPage = page === totalPages - 1
         
-        // For the last page, always take everything remaining to avoid missing content
+        // For the last page, take all remaining content, otherwise use standard height
         const sourceHeight = isLastPage 
           ? canvas.height - sourceY  // Take all remaining content
           : originalHeightPerPage
         
-        // Skip if this would be a blank or nearly blank page
-        if (sourceHeight <= 10) {
-          console.log(`Skipping page ${page + 1} - too little content (${sourceHeight}px)`)
+        // Double-check that we have meaningful content
+        if (sourceHeight <= minContentHeight) {
+          console.log(`Skipping page ${page + 1} - insufficient content (${sourceHeight.toFixed(1)}px)`)
           continue
         }
         
-        // Set canvas size for full page height to maintain consistent background
+        // Set canvas size for this page
         tempCanvas.width = canvas.width
-        tempCanvas.height = Math.ceil(originalHeightPerPage)
+        tempCanvas.height = Math.ceil(isLastPage ? sourceHeight : originalHeightPerPage)
         
         // Fill with background color first
         tempCtx.fillStyle = '#2d3748'
@@ -442,10 +450,12 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
         // Convert this page to image data
         const pageImgData = tempCanvas.toDataURL('image/png')
         
-        // Always use full page height for consistent appearance
-        const pageScaledHeight = pageHeight
+        // Scale the page to fit PDF dimensions
+        const pageScaledHeight = isLastPage 
+          ? (sourceHeight / canvas.height) * scaledHeight  // Proportional height for last page
+          : pageHeight  // Full page height for complete pages
         
-        // Add this page to the PDF, filling the full page height
+        // Add this page to the PDF
         pdf.addImage(pageImgData, 'PNG', 0, 0, scaledWidth, pageScaledHeight)
         
         console.log(`Added page ${page + 1}/${totalPages}, sourceHeight: ${sourceHeight.toFixed(1)}px, scaledHeight: ${pageScaledHeight.toFixed(1)}pt`)

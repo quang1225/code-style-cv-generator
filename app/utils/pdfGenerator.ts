@@ -78,41 +78,7 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
     throw new Error('Resume content not found')
   }
 
-  // Create loading indicator
-  const loadingElement = document.createElement('div')
-  loadingElement.innerHTML = `
-    <div style="
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 10000;
-      background: rgba(0, 0, 0, 0.8);
-      color: white;
-      padding: 20px;
-      border-radius: 8px;
-      font-family: Monaco, monospace;
-      text-align: center;
-    ">
-      <div style="
-        width: 20px;
-        height: 20px;
-        border: 2px solid #4fd1c7;
-        border-top: 2px solid transparent;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 10px;
-      "></div>
-      Generating PDF...
-    </div>
-    <style>
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-    </style>
-  `
-  document.body.appendChild(loadingElement)
+
 
   try {
     // Wait for fonts and images to load
@@ -134,9 +100,9 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
       foreignObjectRendering: false,
       logging: false,
       width: element.offsetWidth,
-      height: Math.max(element.offsetHeight, element.scrollHeight) + 20, // Small buffer to ensure content capture
+      height: element.scrollHeight, // Use actual scroll height without buffer
       windowWidth: element.offsetWidth,
-      windowHeight: Math.max(element.offsetHeight, element.scrollHeight) + 20,
+      windowHeight: element.scrollHeight,
       x: 0,
       y: 0,
       scrollX: 0,
@@ -174,7 +140,7 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
                   font-size: 14px !important;
                   line-height: 1.5 !important;
                   width: 794px !important;
-                  height: 1122px !important;
+                  min-height: 1122px !important;
                   padding: 32px 0 !important;
                   margin: 0 !important;
                 }
@@ -331,8 +297,7 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
       }
     })
 
-    // Remove loading indicator
-    document.body.removeChild(loadingElement)
+
 
     console.log('Canvas generated:', {
       width: canvas.width,
@@ -388,21 +353,9 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
     } else {
       // Content needs multiple pages - use full page height, no white space
       const pageHeight = pdfHeight
+      const totalPages = Math.ceil(scaledHeight / pageHeight)
       
-      // Calculate how much original canvas height fits in one PDF page
-      const originalHeightPerPage = canvas.height / (scaledHeight / pageHeight)
-      
-      // Calculate total pages more accurately - only create pages that have substantial content
-      const minContentHeight = 50 // Minimum content height to warrant a new page
-      let totalPages = Math.floor(canvas.height / originalHeightPerPage)
-      const remainder = canvas.height % originalHeightPerPage
-      
-      // Only add an extra page if there's substantial remaining content
-      if (remainder > minContentHeight) {
-        totalPages += 1
-      }
-      
-      console.log(`Content requires ${totalPages} pages (originalHeightPerPage: ${originalHeightPerPage.toFixed(1)}px, remainder: ${remainder.toFixed(1)}px)`)
+      console.log(`Content requires ${totalPages} pages`)
       
       // Create a temporary canvas for each page
       const tempCanvas = document.createElement('canvas')
@@ -411,6 +364,10 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
       if (!tempCtx) {
         throw new Error('Could not create temporary canvas context')
       }
+      
+      // Use a simpler, more reliable approach
+      // Calculate how much original canvas height fits in one PDF page
+      const originalHeightPerPage = canvas.height / (scaledHeight / pageHeight)
       
       for (let page = 0; page < totalPages; page++) {
         if (page > 0) {
@@ -421,20 +378,20 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
         const sourceY = page * originalHeightPerPage
         const isLastPage = page === totalPages - 1
         
-        // For the last page, take all remaining content, otherwise use standard height
+        // For the last page, always take everything remaining to avoid missing content
         const sourceHeight = isLastPage 
           ? canvas.height - sourceY  // Take all remaining content
           : originalHeightPerPage
         
-        // Double-check that we have meaningful content
-        if (sourceHeight <= minContentHeight) {
-          console.log(`Skipping page ${page + 1} - insufficient content (${sourceHeight.toFixed(1)}px)`)
+        // Skip if this would be a blank or nearly blank page
+        if (sourceHeight <= 50) {
+          console.log(`Skipping page ${page + 1} - too little content (${sourceHeight}px)`)
           continue
         }
         
-        // Set canvas size for this page
+        // Set canvas size for full page height to maintain consistent background
         tempCanvas.width = canvas.width
-        tempCanvas.height = Math.ceil(isLastPage ? sourceHeight : originalHeightPerPage)
+        tempCanvas.height = Math.ceil(originalHeightPerPage)
         
         // Fill with background color first
         tempCtx.fillStyle = '#2d3748'
@@ -450,12 +407,10 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
         // Convert this page to image data
         const pageImgData = tempCanvas.toDataURL('image/png')
         
-        // Scale the page to fit PDF dimensions
-        const pageScaledHeight = isLastPage 
-          ? (sourceHeight / canvas.height) * scaledHeight  // Proportional height for last page
-          : pageHeight  // Full page height for complete pages
+        // Always use full page height for consistent appearance
+        const pageScaledHeight = pageHeight
         
-        // Add this page to the PDF
+        // Add this page to the PDF, filling the full page height
         pdf.addImage(pageImgData, 'PNG', 0, 0, scaledWidth, pageScaledHeight)
         
         console.log(`Added page ${page + 1}/${totalPages}, sourceHeight: ${sourceHeight.toFixed(1)}px, scaledHeight: ${pageScaledHeight.toFixed(1)}pt`)
@@ -471,10 +426,7 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
     console.log(`Error generating PDF: ${errorMessage}. Please try again.`)
     
-    // Remove loading indicator if it exists
-    if (document.body.contains(loadingElement)) {
-      document.body.removeChild(loadingElement)
-    }
+
     
     return { success: false, message: `Error generating PDF: ${errorMessage}. Please try again.` }
   }

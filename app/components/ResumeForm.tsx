@@ -19,6 +19,7 @@ interface ResumeFormProps {
   onUpdate: (data: ResumeData) => void
   onClose: () => void
   isInline?: boolean
+  disabled?: boolean
 }
 
 // Debounce hook for performance optimization
@@ -38,7 +39,7 @@ const useDebounce = (value: any, delay: number) => {
   return debouncedValue
 }
 
-const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInline = false }) => {
+const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInline = false, disabled = false }) => {
   const [formData, setFormData] = useState<ResumeData>(data)
   const [activeTab, setActiveTab] = useState('personal')
 
@@ -169,18 +170,21 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
         </div>
       )}
 
-      <div className="flex items-center space-x-2 mb-4">
-        <Checkbox
-          id="show-copyright"
-          checked={formData.showCopyright}
-          onCheckedChange={(checked) => handleBooleanChange('showCopyright', checked === true)}
-        />
-        <Label htmlFor="show-copyright" className="text-sm font-normal">
-          Show watermark
-        </Label>
-      </div>
+      <div className={`${disabled ? 'opacity-50 pointer-events-none' : ''}`}>
+        <div className="mb-4">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="show-copyright"
+              checked={formData.showCopyright}
+              onCheckedChange={(checked) => handleBooleanChange('showCopyright', checked === true)}
+            />
+            <Label htmlFor="show-copyright" className="text-sm font-normal">
+              Show watermark
+            </Label>
+          </div>
+        </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="personal">Personal</TabsTrigger>
           <TabsTrigger value="work">Work</TabsTrigger>
@@ -194,7 +198,10 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                 <Label htmlFor="profile-picture">Profile Picture</Label>
                 <div className="mt-2 flex items-center space-x-4">
                   <div className="relative">
-                    <div className="w-16 h-16 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
+                    <label 
+                      htmlFor="profile-picture"
+                      className="w-16 h-16 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden cursor-pointer hover:bg-gray-200 transition-colors"
+                    >
                       {formData.avatar ? (
                         <img 
                           src={formData.avatar} 
@@ -204,7 +211,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                       ) : (
                         <User className="w-6 h-6 text-gray-400" />
                       )}
-                    </div>
+                    </label>
                     <label 
                       htmlFor="profile-picture"
                       className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1 cursor-pointer hover:bg-primary/90 transition-colors"
@@ -486,6 +493,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
           </TabsContent>
         </div>
       </Tabs>
+      </div>
     </div>
   )
 

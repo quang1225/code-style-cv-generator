@@ -173,6 +173,7 @@ export default function Home() {
                   onUpdate={handleUpdateResume}
                   onClose={() => {}}
                   isInline={true}
+                  disabled={isGeneratingPDF}
                 />
                 <div className="mt-6 space-y-4">
                   {pdfStatus.type && (

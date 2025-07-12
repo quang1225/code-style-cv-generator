@@ -17,7 +17,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
       const contentHeight = contentRef.current.scrollHeight
       const lineHeight = 20 // Adjusted line height to match actual rendered height
       const calculatedLines = Math.ceil(contentHeight / lineHeight)
-      setLineCount(Math.max(Math.min(calculatedLines + 5, 60), 30)) // Cap at 60 lines, minimum 30 lines
+      setLineCount(Math.max(calculatedLines + 5, 30)) // Add small buffer, minimum 30 lines, no max cap
     }
   }, [data])
 
@@ -119,7 +119,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
           <div className="flex gap-6">
             {/* Line Numbers */}
             <div className="text-gray-600 text-xs leading-relaxed" style={{ paddingTop: '1px', width: '60px', flexShrink: 0 }}>
-              {Array.from({ length: Math.min(lineCount, 99) }, (_, i) => (
+              {Array.from({ length: lineCount }, (_, i) => (
                 <div key={i} className="text-right" style={{ lineHeight: '1.25', height: '20px' }}>
                   {i + 1}
                 </div>

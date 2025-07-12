@@ -122,7 +122,8 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
       elementWidth: element.offsetWidth,
       elementHeight: element.offsetHeight,
       scrollWidth: element.scrollWidth,
-      scrollHeight: element.scrollHeight
+      scrollHeight: element.scrollHeight,
+      captureHeight: Math.max(element.offsetHeight, element.scrollHeight) + 20
     })
 
     const canvas = await html2canvas(element, {
@@ -133,9 +134,9 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
       foreignObjectRendering: false,
       logging: false,
       width: element.offsetWidth,
-      height: element.offsetHeight,
+      height: Math.max(element.offsetHeight, element.scrollHeight) + 20, // Small buffer to ensure content capture
       windowWidth: element.offsetWidth,
-      windowHeight: element.offsetHeight,
+      windowHeight: Math.max(element.offsetHeight, element.scrollHeight) + 20,
       x: 0,
       y: 0,
       scrollX: 0,
@@ -143,78 +144,131 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
       onclone: (clonedDoc) => {
         const clonedElement = clonedDoc.getElementById('resume-content')
         if (clonedElement) {
-          // Completely remove all CSS and replace with basic inline styles
+          // Create a safe CSS replacement that avoids oklch/hsl color functions
           const head = clonedDoc.querySelector('head')
           if (head) {
-            head.innerHTML = ''
+            head.innerHTML = `
+              <style>
+                /* Reset to avoid conflicts */
+                * { box-sizing: border-box; }
+                
+                /* Resume container */
+                #resume-content {
+                  background-color: #2d3748 !important;
+                  color: #4fd1c7 !important;
+                  font-family: Monaco, Menlo, monospace !important;
+                  font-size: 14px !important;
+                  line-height: 1.5 !important;
+                  width: 794px !important;
+                  height: 1122px !important;
+                  padding: 48px 0 !important;
+                  margin: 0 !important;
+                }
+                
+                /* Layout styles */
+                .flex { display: flex !important; }
+                .flex-1 { flex: 1 !important; }
+                .gap-6 { gap: 1.5rem !important; }
+                .gap-4 { gap: 1rem !important; }
+                .gap-1 { gap: 0.25rem !important; }
+                .items-center { align-items: center !important; }
+                .items-start { align-items: flex-start !important; }
+                .justify-between { justify-content: space-between !important; }
+                .space-y-6 > * + * { margin-top: 1.5rem !important; }
+                .space-y-4 > * + * { margin-top: 1rem !important; }
+                .space-y-1 > * + * { margin-top: 0.25rem !important; }
+                .mb-8 { margin-bottom: 2rem !important; }
+                .mb-4 { margin-bottom: 1rem !important; }
+                .mb-3 { margin-bottom: 0.75rem !important; }
+                .mb-2 { margin-bottom: 0.5rem !important; }
+                .mb-1 { margin-bottom: 0.25rem !important; }
+                .max-w-md { max-width: 28rem !important; }
+                .max-w-xs { max-width: 20rem !important; }
+                .shrink-0 { flex-shrink: 0 !important; }
+                .text-right { text-align: right !important; }
+                .text-left { text-align: left !important; }
+                .leading-relaxed { line-height: 1.625 !important; }
+                .relative { position: relative !important; }
+                .absolute { position: absolute !important; }
+                .left-\\[4\\.5rem\\] { left: 4.5rem !important; }
+                .top-0 { top: 0 !important; }
+                .whitespace-nowrap { white-space: nowrap !important; }
+                
+                /* Typography */
+                .text-3xl { font-size: 1.875rem !important; }
+                .text-2xl { font-size: 1.5rem !important; }
+                .text-base { font-size: 1rem !important; }
+                .text-sm { font-size: 0.875rem !important; }
+                .text-xs { font-size: 0.75rem !important; }
+                .text-\\[10px\\] { font-size: 10px !important; }
+                .font-bold { font-weight: 700 !important; }
+                .font-semibold { font-weight: 600 !important; }
+                .font-normal { font-weight: 400 !important; }
+                .font-mono { font-family: Monaco, Menlo, monospace !important; }
+                
+                /* Colors - using safe hex values */
+                .text-white { color: #ffffff !important; }
+                .text-green-400 { color: #4fd1c7 !important; }
+                .text-orange-400 { color: #fb923c !important; }
+                .text-blue-400 { color: #3b82f6 !important; }
+                .text-blue-300 { color: #93c5fd !important; }
+                .text-gray-400 { color: #9ca3af !important; }
+                .text-gray-300 { color: #d1d5db !important; }
+                .text-gray-600 { color: #6b7280 !important; }
+                .text-gray-500 { color: #6b7280 !important; }
+                .bg-gray-600 { background-color: #4b5563 !important; }
+                .border-2 { border-width: 2px !important; }
+                .border-green-400 { border-color: #4fd1c7 !important; }
+                .rounded-full { border-radius: 9999px !important; }
+                .w-16 { width: 4rem !important; }
+                .h-16 { height: 4rem !important; }
+                .w-3 { width: 0.75rem !important; }
+                .h-3 { height: 0.75rem !important; }
+                .underline { text-decoration: underline !important; }
+                
+                /* Hover states */
+                a:hover { color: #93c5fd !important; }
+                
+                /* Remove any problematic CSS custom properties */
+                * { 
+                  font-family: Monaco, Menlo, monospace !important;
+                }
+              </style>
+            `
           }
           
-          // Remove all stylesheets
-          const stylesheets = clonedDoc.querySelectorAll('style, link[rel="stylesheet"]')
-          stylesheets.forEach(sheet => sheet.remove())
+          // Remove only external stylesheets, keep our safe CSS
+          const externalStylesheets = clonedDoc.querySelectorAll('link[rel="stylesheet"]')
+          externalStylesheets.forEach(sheet => sheet.remove())
           
-          // Apply basic inline styles to all elements
+          // Clean up any remaining style attributes that might contain unsupported color functions
           const allElements = clonedElement.querySelectorAll('*')
           allElements.forEach(el => {
             const htmlEl = el as HTMLElement
             
             try {
-              // Remove all CSS classes and existing styles
-              htmlEl.removeAttribute('class')
-              htmlEl.removeAttribute('style')
+              // Only remove style attributes that might contain problematic color functions
+              if (htmlEl.style.cssText) {
+                const styleText = htmlEl.style.cssText
+                if (styleText.includes('oklch') || styleText.includes('hsl(') || styleText.includes('var(--')) {
+                  htmlEl.removeAttribute('style')
+                }
+              }
               
-              // Apply basic styles
-              htmlEl.style.fontFamily = 'Monaco, Menlo, monospace'
-              htmlEl.style.color = '#d1d5db'
-              htmlEl.style.backgroundColor = 'transparent'
-              htmlEl.style.border = 'none'
-              htmlEl.style.margin = '0'
-              htmlEl.style.padding = '0'
-              
-              // Apply specific colors based on tag type only
-              const tagName = htmlEl.tagName.toLowerCase()
-              switch (tagName) {
-                case 'h1':
-                case 'h2':
-                case 'h3':
-                  htmlEl.style.color = '#fb923c'
-                  break
-                case 'a':
-                  htmlEl.style.color = '#3b82f6'
-                  htmlEl.style.textDecoration = 'underline'
-                  break
-                case 'strong':
-                  htmlEl.style.fontWeight = 'bold'
-                  break
-                case 'em':
-                  htmlEl.style.fontStyle = 'italic'
-                  break
-                case 'svg':
-                  htmlEl.style.fill = '#d1d5db'
-                  break
-                default:
-                  htmlEl.style.color = '#d1d5db'
+              // Ensure font family is applied
+              if (!htmlEl.style.fontFamily) {
+                htmlEl.style.fontFamily = 'Monaco, Menlo, monospace'
               }
               
             } catch (error) {
               console.warn('Error processing element:', error)
-              // Fallback to safe defaults
-              htmlEl.style.color = '#d1d5db'
-              htmlEl.style.backgroundColor = 'transparent'
-              htmlEl.style.fontFamily = 'Monaco, Menlo, monospace'
             }
           })
           
-          // Apply styles to the root element
+          // Ensure the root element has the correct background
           clonedElement.style.backgroundColor = '#2d3748'
           clonedElement.style.color = '#4fd1c7'
           clonedElement.style.fontFamily = 'Monaco, Menlo, monospace'
-          clonedElement.style.fontSize = '14px'
-          clonedElement.style.lineHeight = '1.5'
-          clonedElement.style.width = '794px'
-          clonedElement.style.height = '1122px'
-          clonedElement.style.padding = '48px 0'
-          clonedElement.style.margin = '0'
         }
       }
     })
@@ -254,27 +308,92 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
     const imgHeight = canvas.height
     
     // Calculate scale to fit A4 full width
-    const scale = pdfWidth / imgWidth // Use full width scaling
-    
+    const scale = pdfWidth / imgWidth
     const scaledWidth = imgWidth * scale
     const scaledHeight = imgHeight * scale
     
-    const x = 0 // Full width - no centering
-    const y = Math.max(0, (pdfHeight - scaledHeight) / 2) // Center vertically if it fits
-
-    console.log('Adding image to PDF:', {
+    console.log('PDF dimensions:', {
       pdfWidth,
       pdfHeight,
       imgWidth,
       imgHeight,
       scale,
       scaledWidth,
-      scaledHeight,
-      x,
-      y
+      scaledHeight
     })
 
-    pdf.addImage(imgData, 'PNG', x, y, scaledWidth, scaledHeight)
+    // Check if content fits on one page
+    if (scaledHeight <= pdfHeight) {
+      // Content fits on one page
+      const y = Math.max(0, (pdfHeight - scaledHeight) / 2)
+      pdf.addImage(imgData, 'PNG', 0, y, scaledWidth, scaledHeight)
+    } else {
+      // Content needs multiple pages - use full page height, no white space
+      const pageHeight = pdfHeight
+      const totalPages = Math.ceil(scaledHeight / pageHeight)
+      
+      console.log(`Content requires ${totalPages} pages`)
+      
+      // Create a temporary canvas for each page
+      const tempCanvas = document.createElement('canvas')
+      const tempCtx = tempCanvas.getContext('2d')
+      
+      if (!tempCtx) {
+        throw new Error('Could not create temporary canvas context')
+      }
+      
+      // Use a simpler, more reliable approach
+      // Calculate how much original canvas height fits in one PDF page
+      const originalHeightPerPage = canvas.height / (scaledHeight / pageHeight)
+      
+      for (let page = 0; page < totalPages; page++) {
+        if (page > 0) {
+          pdf.addPage()
+        }
+        
+        // Calculate the source rectangle for this page
+        const sourceY = page * originalHeightPerPage
+        const isLastPage = page === totalPages - 1
+        
+        // For the last page, always take everything remaining to avoid missing content
+        const sourceHeight = isLastPage 
+          ? canvas.height - sourceY  // Take all remaining content
+          : originalHeightPerPage
+        
+        // Skip if this would be a blank or nearly blank page
+        if (sourceHeight <= 10) {
+          console.log(`Skipping page ${page + 1} - too little content (${sourceHeight}px)`)
+          continue
+        }
+        
+        // Set canvas size for full page height to maintain consistent background
+        tempCanvas.width = canvas.width
+        tempCanvas.height = Math.ceil(originalHeightPerPage)
+        
+        // Fill with background color first
+        tempCtx.fillStyle = '#2d3748'
+        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height)
+        
+        // Draw the portion of the original canvas for this page
+        tempCtx.drawImage(
+          canvas,
+          0, sourceY, canvas.width, sourceHeight,  // source rectangle
+          0, 0, tempCanvas.width, sourceHeight     // destination rectangle
+        )
+        
+        // Convert this page to image data
+        const pageImgData = tempCanvas.toDataURL('image/png')
+        
+        // Always use full page height for consistent appearance
+        const pageScaledHeight = pageHeight
+        
+        // Add this page to the PDF, filling the full page height
+        pdf.addImage(pageImgData, 'PNG', 0, 0, scaledWidth, pageScaledHeight)
+        
+        console.log(`Added page ${page + 1}/${totalPages}, sourceHeight: ${sourceHeight.toFixed(1)}px, scaledHeight: ${pageScaledHeight.toFixed(1)}pt`)
+      }
+    }
+
     pdf.save('alexandra-morgan-resume.pdf')
     
     console.log('PDF generated successfully')

@@ -1,6 +1,11 @@
+
 # Code Style CV Generator
 
 A Next.js application that generates developer-style CVs with a terminal/code-like design, exactly matching the provided design template.
+
+## Demo
+
+[https://code-style-cv-generator.quang.work/](https://code-style-cv-generator.quang.work/)
 
 ## Features
 

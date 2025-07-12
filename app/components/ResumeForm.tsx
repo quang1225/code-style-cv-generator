@@ -431,7 +431,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                       {section.items.map((item, itemIndex) => (
                         <div key={item.id} className="border rounded-lg p-4 space-y-3">
                           <div className="flex justify-between items-start">
-                            <h4 className="text-sm font-medium text-gray-700">Item {itemIndex + 1}</h4>
+                            <h4 className="text-sm font-medium text-foreground">Item {itemIndex + 1}</h4>
                             <Button
                               type="button"
                               onClick={() => removeCustomSectionItem(sectionIndex, itemIndex)}

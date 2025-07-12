@@ -54,7 +54,7 @@ const convertColorToHex = (color: string): string => {
 
 // Define explicit color mappings for all CSS classes
 const colorMappings = {
-  'text-green-400': '#4fd1c7',
+  'text-green-400': '#4ade80',
   'text-white': '#ffffff',
   'text-gray-400': '#9ca3af',
   'text-gray-300': '#d1d5db',
@@ -67,7 +67,7 @@ const colorMappings = {
   'text-yellow-500': '#f59e0b',
   'text-purple-500': '#8b5cf6',
   'bg-gray-600': '#4b5563',
-  'border-green-400': '#4fd1c7',
+  'border-green-400': '#4ade80',
   'bg-resume-bg': '#2d3748',
   'text-resume-text': '#4fd1c7'
 }
@@ -149,6 +149,20 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
           if (head) {
             head.innerHTML = `
               <style>
+                /* 
+                ⚠️  IMPORTANT: PDF CSS CONSISTENCY MAINTENANCE
+                
+                This CSS must be kept in sync with the ResumePreview component.
+                When adding new Tailwind classes to ResumePreview.tsx, ensure they are 
+                mapped here with their exact hex/rem values.
+                
+                To maintain consistency:
+                1. Any new Tailwind class in ResumePreview.tsx must be added here
+                2. Use exact hex colors (not CSS variables) for PDF compatibility
+                3. Use rem/px units (not CSS variables) for measurements
+                4. Test both preview and PDF output after changes
+                */
+                
                 /* Reset to avoid conflicts */
                 * { box-sizing: border-box; }
                 
@@ -161,7 +175,7 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
                   line-height: 1.5 !important;
                   width: 794px !important;
                   height: 1122px !important;
-                  padding: 48px 0 !important;
+                  padding: 32px 0 !important;
                   margin: 0 !important;
                 }
                 
@@ -170,29 +184,35 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
                 .flex-1 { flex: 1 !important; }
                 .gap-6 { gap: 1.5rem !important; }
                 .gap-4 { gap: 1rem !important; }
+                .gap-3 { gap: 0.75rem !important; }
+                .gap-8 { gap: 2rem !important; }
+                .gap-2 { gap: 0.5rem !important; }
                 .gap-1 { gap: 0.25rem !important; }
                 .items-center { align-items: center !important; }
                 .items-start { align-items: flex-start !important; }
+                .justify-center { justify-content: center !important; }
                 .justify-between { justify-content: space-between !important; }
                 .space-y-6 > * + * { margin-top: 1.5rem !important; }
                 .space-y-4 > * + * { margin-top: 1rem !important; }
                 .space-y-1 > * + * { margin-top: 0.25rem !important; }
+                .mx-2 { margin-left: 0.5rem !important; margin-right: 0.5rem !important; }
                 .mb-8 { margin-bottom: 2rem !important; }
                 .mb-4 { margin-bottom: 1rem !important; }
                 .mb-3 { margin-bottom: 0.75rem !important; }
                 .mb-2 { margin-bottom: 0.5rem !important; }
                 .mb-1 { margin-bottom: 0.25rem !important; }
-                .max-w-md { max-width: 28rem !important; }
-                .max-w-xs { max-width: 20rem !important; }
                 .shrink-0 { flex-shrink: 0 !important; }
+                .min-w-0 { min-width: 0 !important; }
                 .text-right { text-align: right !important; }
                 .text-left { text-align: left !important; }
                 .leading-relaxed { line-height: 1.625 !important; }
                 .relative { position: relative !important; }
                 .absolute { position: absolute !important; }
-                .left-\\[4\\.5rem\\] { left: 4.5rem !important; }
-                .top-0 { top: 0 !important; }
+                .top-2 { top: 0.5rem !important; }
+                .left-2 { left: 0.5rem !important; }
                 .whitespace-nowrap { white-space: nowrap !important; }
+                .z-10 { z-index: 10 !important; }
+                .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important; }
                 
                 /* Typography */
                 .text-3xl { font-size: 1.875rem !important; }
@@ -208,7 +228,7 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
                 
                 /* Colors - using safe hex values */
                 .text-white { color: #ffffff !important; }
-                .text-green-400 { color: #4fd1c7 !important; }
+                .text-green-400 { color: #4ade80 !important; }
                 .text-orange-400 { color: #fb923c !important; }
                 .text-blue-400 { color: #3b82f6 !important; }
                 .text-blue-300 { color: #93c5fd !important; }
@@ -217,21 +237,59 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
                 .text-gray-600 { color: #6b7280 !important; }
                 .text-gray-500 { color: #6b7280 !important; }
                 .bg-gray-600 { background-color: #4b5563 !important; }
-                .border-2 { border-width: 2px !important; }
-                .border-green-400 { border-color: #4fd1c7 !important; }
+                .border-2 { border-width: 2px !important; border-style: solid !important; }
+                .border-green-400 { border-color: #4ade80 !important; }
                 .rounded-full { border-radius: 9999px !important; }
+                
+                /* Dimensions */
                 .w-16 { width: 4rem !important; }
                 .h-16 { height: 4rem !important; }
+                .w-20 { width: 5rem !important; }
+                .h-20 { height: 5rem !important; }
+                .w-24 { width: 6rem !important; }
+                .h-24 { height: 6rem !important; }
                 .w-3 { width: 0.75rem !important; }
                 .h-3 { height: 0.75rem !important; }
+                
+                /* Text decoration */
                 .underline { text-decoration: underline !important; }
                 
-                /* Hover states */
+                /* Hover states (approximated for PDF since hover doesn't apply) */
                 a:hover { color: #93c5fd !important; }
+                .hover\\:text-blue-300:hover { color: #93c5fd !important; }
+                .hover\\:text-gray-500:hover { color: #6b7280 !important; }
+                
+                /* Since PDFs don't support hover, we'll use the base colors */
+                .hover\\:text-blue-300 { color: #3b82f6 !important; }
+                .hover\\:text-gray-500 { color: #6b7280 !important; }
+                
+                /* Specific class for preventing period breaks - only for period text */
+                .prevent-period-break {
+                  display: inline-block !important;
+                  word-break: keep-all !important;
+                  overflow-wrap: normal !important;
+                  hyphens: none !important;
+                  white-space: nowrap !important;
+                  text-wrap: nowrap !important;
+                  flex-shrink: 0 !important;
+                }
+                
+                .resume-rich-text {
+                  text-wrap: pretty !important;
+                  hyphens: auto !important;
+                  word-break: normal !important;
+                  overflow-wrap: break-word !important;
+                }
                 
                 /* Remove any problematic CSS custom properties */
                 * { 
                   font-family: Monaco, Menlo, monospace !important;
+                }
+                
+                /* General resume text formatting */
+                #resume-content {
+                  text-wrap: pretty !important;
+                  hyphens: auto !important;
                 }
               </style>
             `

@@ -9,11 +9,12 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Camera, User, Plus, X } from "lucide-react";
+import { Camera, User, Plus, X, Download, Upload } from "lucide-react";
 import RichTextEditor from "./RichTextEditor";
 import ReactCrop, { Crop, PixelCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import { useTheme } from "next-themes";
+import ConfirmationDialog from "./ConfirmationDialog";
 
 interface ResumeFormProps {
   data: ResumeData;
@@ -63,6 +64,12 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
   });
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const imgRef = useRef<HTMLImageElement>(null);
+
+  // Backup/Restore related states
+  const [showConfirmRestore, setShowConfirmRestore] = useState(false);
+  const [pendingRestoreData, setPendingRestoreData] =
+    useState<ResumeData | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Debounced form data for performance optimization
   const debouncedFormData = useDebounce(formData, 300);
@@ -306,6 +313,81 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
     setCompletedCrop(undefined as any);
   }, []);
 
+  // Backup functionality - download current form data as JSON
+  const handleBackup = useCallback(() => {
+    try {
+      const dataStr = JSON.stringify(formData, null, 2);
+      const dataUri =
+        "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+
+      const exportFileDefaultName = `resume_backup_${
+        new Date().toISOString().split("T")[0]
+      }.json`;
+
+      const linkElement = document.createElement("a");
+      linkElement.setAttribute("href", dataUri);
+      linkElement.setAttribute("download", exportFileDefaultName);
+      linkElement.click();
+    } catch (error) {
+      console.error("Error backing up resume data:", error);
+    }
+  }, [formData]);
+
+  // Restore functionality - upload JSON file and populate form
+  const handleRestoreClick = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleRestoreFileSelect = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const jsonData = JSON.parse(e.target?.result as string);
+
+          // Validate that the JSON has the required structure
+          if (
+            !jsonData.name ||
+            !jsonData.title ||
+            !jsonData.workExperience ||
+            !jsonData.customSections
+          ) {
+            throw new Error("Invalid resume data format");
+          }
+
+          setPendingRestoreData(jsonData);
+          setShowConfirmRestore(true);
+        } catch (error) {
+          console.error("Error parsing JSON file:", error);
+          alert(
+            "Invalid JSON file format. Please make sure you selected a valid resume backup file."
+          );
+        }
+      };
+
+      reader.readAsText(file);
+      // Reset file input to allow selecting the same file again
+      event.target.value = "";
+    },
+    []
+  );
+
+  const handleConfirmRestore = useCallback(() => {
+    if (pendingRestoreData) {
+      setFormData(pendingRestoreData);
+      setShowConfirmRestore(false);
+      setPendingRestoreData(null);
+    }
+  }, [pendingRestoreData]);
+
+  const handleCancelRestore = useCallback(() => {
+    setShowConfirmRestore(false);
+    setPendingRestoreData(null);
+  }, []);
+
   const formContent = (
     <div className={isInline ? "" : "p-6"}>
       {!isInline && (
@@ -332,6 +414,50 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
             </Label>
           </div>
         </div>
+
+        {/* Backup/Restore Section */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-medium">Backup & Restore</Label>
+            <div className="flex space-x-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleBackup}
+                disabled={disabled}
+                className="flex items-center space-x-2"
+              >
+                <Download className="w-4 h-4" />
+                <span>Backup</span>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleRestoreClick}
+                disabled={disabled}
+                className="flex items-center space-x-2"
+              >
+                <Upload className="w-4 h-4" />
+                <span>Restore</span>
+              </Button>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            Backup your current resume data to a JSON file, or restore from a
+            previously saved backup.
+          </p>
+        </div>
+
+        {/* Hidden file input for restore */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json"
+          onChange={handleRestoreFileSelect}
+          className="hidden"
+        />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
@@ -855,6 +981,18 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
           </div>,
           document.body
         )}
+
+      {/* Confirmation Dialog for Restore */}
+      <ConfirmationDialog
+        isOpen={showConfirmRestore}
+        onClose={handleCancelRestore}
+        onConfirm={handleConfirmRestore}
+        title="Restore Resume Data"
+        message="Are you sure you want to restore from this backup? This will replace all current data in the form and cannot be undone."
+        confirmText="Restore"
+        cancelText="Cancel"
+        isDestructive={true}
+      />
     </>
   );
 };

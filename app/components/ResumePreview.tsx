@@ -103,7 +103,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
       >
         {/* Copyright text at top right border */}
         {data.showCopyright && (
-          <div className="absolute top-2 right-2 text-[10px] text-gray-600 font-normal whitespace-nowrap z-10">
+          <div className="absolute top-2 right-2 text-[11px] text-gray-600 font-normal whitespace-nowrap z-10">
             CV made with{" "}
             <a
               href="https://code-style-cv-generator.quang.work/"
@@ -192,7 +192,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                     /summary
                   </h2>
                   <div className="text-gray-300 leading-relaxed text-xs">
-                    {formatText(data.summary)}
+                    {formatLinkText(data.summary)}
                   </div>
                 </section>
 
@@ -226,7 +226,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                           </p>
                         </div>
                         <div className="text-gray-300 text-xs leading-relaxed">
-                          {formatText(job.description)}
+                          {formatLinkText(job.description)}
                         </div>
                       </div>
                     ))}
@@ -264,9 +264,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                           </div>
                           {item.description && (
                             <div className="text-gray-300 text-xs leading-relaxed">
-                              {section.title.toLowerCase() === "links"
-                                ? formatLinkText(item.description)
-                                : formatText(item.description)}
+                              {formatLinkText(item.description)}
                             </div>
                           )}
                         </div>

@@ -35,7 +35,7 @@ export default function Home() {
     try {
       setIsGeneratingPDF(true);
       setPdfStatus({ type: null, message: "" });
-      const result = await generatePDF();
+      const result = await generatePDF(resumeData.name);
       setPdfStatus({
         type: result.success ? "success" : "error",
         message: result.message,
@@ -59,7 +59,7 @@ export default function Home() {
     } finally {
       setIsGeneratingPDF(false);
     }
-  }, []);
+  }, [resumeData.name]);
 
   const handleUpdateResume = useCallback((newData: ResumeData) => {
     setResumeData(newData);

@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @plugin 'tailwindcss-animate';
 
@@ -70,18 +70,14 @@
 
 /* Custom smooth transitions */
 @utility smooth-expand {
-  transition:
-    width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
-    transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
-    box-shadow 0.4s ease-out;
+  transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease-out;
   will-change: width, transform;
 
   &:hover {
     transform: translateZ(0);
-    transition:
-      width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-      box-shadow 0.5s ease-out;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s ease-out;
   }
 }
 
@@ -94,8 +90,8 @@
   .resume-container {
     background: #2d3748;
     color: #4fd1c7;
-    font-family:
-      'Monaco', 'Menlo', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+    font-family: "Monaco", "Menlo", "Consolas", "Liberation Mono", "Courier New",
+      monospace;
   }
 
   .resume-container h1,
@@ -118,7 +114,7 @@
 
   /* Rich text editor styles */
   .rich-text-editor .ql-editor {
-    font-family: 'Monaco', 'Menlo', monospace !important;
+    font-family: "Monaco", "Menlo", monospace !important;
     line-height: 1.5;
     white-space: pre-wrap;
     min-height: 100px;
@@ -126,7 +122,7 @@
   }
 
   .rich-text-editor .ql-toolbar {
-    font-family: 'Monaco', 'Menlo', monospace !important;
+    font-family: "Monaco", "Menlo", monospace !important;
     border: 1px solid hsl(var(--border));
     border-bottom: 1px solid hsl(var(--border));
     background: hsl(var(--background));
@@ -158,7 +154,13 @@
     stroke: hsl(var(--muted-foreground)) !important;
   }
 
-  .dark .rich-text-editor .ql-toolbar .ql-formats button svg .ql-stroke.ql-fill {
+  .dark
+    .rich-text-editor
+    .ql-toolbar
+    .ql-formats
+    button
+    svg
+    .ql-stroke.ql-fill {
     fill: hsl(var(--muted-foreground)) !important;
     stroke: hsl(var(--muted-foreground)) !important;
   }
@@ -175,20 +177,44 @@
     fill: hsl(var(--foreground)) !important;
   }
 
-  .dark .rich-text-editor .ql-toolbar .ql-formats button:hover svg .ql-stroke.ql-fill {
+  .dark
+    .rich-text-editor
+    .ql-toolbar
+    .ql-formats
+    button:hover
+    svg
+    .ql-stroke.ql-fill {
     fill: hsl(var(--foreground)) !important;
     stroke: hsl(var(--foreground)) !important;
   }
 
-  .dark .rich-text-editor .ql-toolbar .ql-formats button.ql-active svg .ql-stroke {
+  .dark
+    .rich-text-editor
+    .ql-toolbar
+    .ql-formats
+    button.ql-active
+    svg
+    .ql-stroke {
     stroke: hsl(var(--primary)) !important;
   }
 
-  .dark .rich-text-editor .ql-toolbar .ql-formats button.ql-active svg .ql-fill {
+  .dark
+    .rich-text-editor
+    .ql-toolbar
+    .ql-formats
+    button.ql-active
+    svg
+    .ql-fill {
     fill: hsl(var(--primary)) !important;
   }
 
-  .dark .rich-text-editor .ql-toolbar .ql-formats button.ql-active svg .ql-stroke.ql-fill {
+  .dark
+    .rich-text-editor
+    .ql-toolbar
+    .ql-formats
+    button.ql-active
+    svg
+    .ql-stroke.ql-fill {
     fill: hsl(var(--primary)) !important;
     stroke: hsl(var(--primary)) !important;
   }
@@ -269,7 +295,7 @@
   }
 
   .rich-text-editor .ql-editor.ql-blank::before {
-    font-family: 'Monaco', 'Menlo', monospace !important;
+    font-family: "Monaco", "Menlo", monospace !important;
     font-style: normal;
     color: hsl(var(--muted-foreground));
   }
@@ -307,7 +333,7 @@
 
   /* Resume preview rich text styles */
   .resume-rich-text {
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: "Monaco", "Menlo", monospace;
     font-size: inherit;
     line-height: inherit;
     color: inherit;
@@ -391,11 +417,43 @@
     text-wrap: pretty;
     hyphens: auto;
   }
+
+  /* Dark mode support for react-image-crop */
+  .crop-dark .ReactCrop {
+    border-color: hsl(var(--border));
+  }
+
+  .crop-dark .ReactCrop__crop-selection {
+    border-color: hsl(var(--primary));
+  }
+
+  .crop-dark .ReactCrop__drag-handle {
+    background-color: hsl(var(--primary));
+    border-color: hsl(var(--primary));
+  }
+
+  .crop-dark .ReactCrop__drag-handle:after {
+    background-color: hsl(var(--primary));
+  }
+
+  .crop-dark .ReactCrop__drag-bar {
+    background-color: hsl(var(--primary));
+  }
+
+  .crop-dark .ReactCrop__drag-bar.ord-n,
+  .crop-dark .ReactCrop__drag-bar.ord-s {
+    background-color: hsl(var(--primary));
+  }
+
+  .crop-dark .ReactCrop__drag-bar.ord-e,
+  .crop-dark .ReactCrop__drag-bar.ord-w {
+    background-color: hsl(var(--primary));
+  }
 }
 
 @layer base {
   html {
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: "Monaco", "Menlo", monospace;
   }
   :root {
     --background: 0 0% 100%;
@@ -452,8 +510,6 @@
   }
 }
 
-
-
 @layer base {
   * {
     @apply border-border;
@@ -468,13 +524,17 @@
   /* Smooth circular reveal animation */
   @keyframes circular-reveal {
     0% {
-      clip-path: circle(0px at var(--theme-toggle-x, 50%) var(--theme-toggle-y, 50%));
+      clip-path: circle(
+        0px at var(--theme-toggle-x, 50%) var(--theme-toggle-y, 50%)
+      );
     }
     100% {
-      clip-path: circle(100vmax at var(--theme-toggle-x, 50%) var(--theme-toggle-y, 50%));
+      clip-path: circle(
+        100vmax at var(--theme-toggle-x, 50%) var(--theme-toggle-y, 50%)
+      );
     }
   }
-  
+
   /* Maximum performance transition properties */
   ::view-transition-old(root),
   ::view-transition-new(root) {
@@ -484,19 +544,19 @@
     transform: translate3d(0, 0, 0);
     backface-visibility: hidden;
   }
-  
+
   /* Smooth circular reveal */
   ::view-transition-new(root) {
     animation: circular-reveal 0.5s ease-out;
     z-index: 2;
   }
-  
+
   /* Static old content for instant switching */
   ::view-transition-old(root) {
     z-index: 1;
     opacity: 1;
   }
-  
+
   /* Enable view transitions */
   html {
     view-transition-name: root;
@@ -511,7 +571,7 @@
   *::after {
     transition: none !important;
   }
-  
+
   /* Only allow transitions on interactive elements that need them */
   button,
   .button,
@@ -520,43 +580,30 @@
   input,
   textarea,
   select {
-    transition: 
-      background-color 0.1s ease-out,
-      border-color 0.1s ease-out,
-      color 0.1s ease-out,
-      transform 0.1s ease-out,
-      opacity 0.1s ease-out !important;
+    transition: background-color 0.1s ease-out, border-color 0.1s ease-out,
+      color 0.1s ease-out, transform 0.1s ease-out, opacity 0.1s ease-out !important;
   }
-  
 
-  
   /* Exception: Allow smooth-expand animations to work */
   .smooth-expand {
-    transition:
-      width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
-      transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
-      box-shadow 0.4s ease-out !important;
+    transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+      transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease-out !important;
   }
-  
+
   .smooth-expand:hover {
-    transition:
-      width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-      box-shadow 0.5s ease-out !important;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s ease-out !important;
   }
-  
+
   /* Exception: Allow important UI animations */
   [class*="hover:shadow"],
   [class*="hover:scale"],
   [class*="hover:bg-"],
   [class*="hover:text-"] {
-    transition:
-      box-shadow 0.2s ease-out,
-      transform 0.2s ease-out,
-      background-color 0.1s ease-out,
-      color 0.1s ease-out !important;
+    transition: box-shadow 0.2s ease-out, transform 0.2s ease-out,
+      background-color 0.1s ease-out, color 0.1s ease-out !important;
   }
-  
+
   /* Exception: Allow width transitions for layout elements */
   [class*="w-["],
   [class*="peer-hover:w-"] {
@@ -611,4 +658,67 @@ select {
 [data-radix-radio-root],
 [data-radix-switch-root] {
   cursor: pointer !important;
-} 
+}
+
+/* Custom HTML view button and toolbar extension styles */
+.rich-text-editor .custom-toolbar-extension {
+  background: hsl(var(--muted));
+  border: 1px solid hsl(var(--border));
+  border-bottom: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rich-text-editor .html-view-container .ql-toolbar {
+  background: hsl(var(--muted));
+  border: 1px solid hsl(var(--border));
+  border-bottom: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rich-text-editor .html-view-container textarea {
+  border: 1px solid hsl(var(--border));
+  border-top: none;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.rich-text-editor .html-view-container textarea:focus {
+  outline: none;
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 2px hsl(var(--ring));
+}
+
+/* Dark mode styles for HTML view */
+.dark .rich-text-editor .custom-toolbar-extension {
+  background: hsl(var(--card));
+  border-color: hsl(var(--border));
+}
+
+.dark .rich-text-editor .html-view-container .ql-toolbar {
+  background: hsl(var(--card));
+  border-color: hsl(var(--border));
+}
+
+.dark .rich-text-editor .html-view-container textarea {
+  background: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  border-color: hsl(var(--border));
+}
+
+.dark .rich-text-editor .html-view-container textarea:focus {
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 2px hsl(var(--ring));
+}
+
+/* Ensure seamless integration with ReactQuill */
+.rich-text-editor .rich-text-container .ql-toolbar {
+  border-top: none;
+}
+
+.rich-text-editor .rich-text-container .ql-container {
+  border-top: none;
+}

@@ -1,6 +1,29 @@
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
+// Function to convert full name to filename format
+const formatNameForFilename = (fullName: string): string => {
+  if (!fullName || fullName.trim() === "") {
+    return "Resume"; // fallback name
+  }
+
+  // Remove diacritics (accented characters) and convert to ASCII
+  const normalizedName = fullName
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D");
+
+  // Replace spaces with underscores and remove special characters
+  const fileName = normalizedName
+    .replace(/\s+/g, "_")
+    .replace(/[^a-zA-Z0-9_]/g, "")
+    .replace(/_+/g, "_")
+    .replace(/^_|_$/g, "");
+
+  return fileName || "Resume"; // fallback if nothing remains
+};
+
 // Helper function to convert oklch/unsupported colors to hex
 const convertColorToHex = (color: string): string => {
   // Handle common color formats first
@@ -14,7 +37,9 @@ const convertColorToHex = (color: string): string => {
     const r = parseInt(rgbMatch[1]);
     const g = parseInt(rgbMatch[2]);
     const b = parseInt(rgbMatch[3]);
-    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+    return `#${r.toString(16).padStart(2, "0")}${g
+      .toString(16)
+      .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
   }
 
   // Handle rgba colors
@@ -23,7 +48,9 @@ const convertColorToHex = (color: string): string => {
     const r = parseInt(rgbaMatch[1]);
     const g = parseInt(rgbaMatch[2]);
     const b = parseInt(rgbaMatch[3]);
-    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+    return `#${r.toString(16).padStart(2, "0")}${g
+      .toString(16)
+      .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
   }
 
   // Try to convert using DOM (for hsl, oklch, etc.)
@@ -37,12 +64,16 @@ const convertColorToHex = (color: string): string => {
     document.body.removeChild(tempDiv);
 
     // Try to convert the computed color
-    const computedRgbMatch = computedColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    const computedRgbMatch = computedColor.match(
+      /rgb\((\d+),\s*(\d+),\s*(\d+)\)/
+    );
     if (computedRgbMatch) {
       const r = parseInt(computedRgbMatch[1]);
       const g = parseInt(computedRgbMatch[2]);
       const b = parseInt(computedRgbMatch[3]);
-      return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+      return `#${r.toString(16).padStart(2, "0")}${g
+        .toString(16)
+        .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
     }
   } catch (error) {
     console.warn("Failed to convert color:", color, error);
@@ -72,7 +103,12 @@ const colorMappings = {
   "text-resume-text": "#4fd1c7",
 };
 
-export const generatePDF = async (): Promise<{ success: boolean; message: string }> => {
+export const generatePDF = async (
+  fullName: string
+): Promise<{
+  success: boolean;
+  message: string;
+}> => {
   const element = document.getElementById("resume-content");
   if (!element) {
     throw new Error("Resume content not found");
@@ -281,7 +317,9 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
           }
 
           // Remove only external stylesheets, keep our safe CSS
-          const externalStylesheets = clonedDoc.querySelectorAll('link[rel="stylesheet"]');
+          const externalStylesheets = clonedDoc.querySelectorAll(
+            'link[rel="stylesheet"]'
+          );
           externalStylesheets.forEach((sheet) => sheet.remove());
 
           // Clean up any remaining style attributes that might contain unsupported color functions
@@ -293,7 +331,11 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
               // Only remove style attributes that might contain problematic color functions
               if (htmlEl.style.cssText) {
                 const styleText = htmlEl.style.cssText;
-                if (styleText.includes("oklch") || styleText.includes("hsl(") || styleText.includes("var(--")) {
+                if (
+                  styleText.includes("oklch") ||
+                  styleText.includes("hsl(") ||
+                  styleText.includes("var(--")
+                ) {
                   htmlEl.removeAttribute("style");
                 }
               }
@@ -401,7 +443,9 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
 
         // Skip if this would be a blank or nearly blank page
         if (sourceHeight <= 50) {
-          console.log(`Skipping page ${page + 1} - too little content (${sourceHeight}px)`);
+          console.log(
+            `Skipping page ${page + 1} - too little content (${sourceHeight}px)`
+          );
           continue;
         }
 
@@ -434,24 +478,21 @@ export const generatePDF = async (): Promise<{ success: boolean; message: string
 
         // Add this page to the PDF, filling the full page height
         pdf.addImage(pageImgData, "PNG", 0, 0, scaledWidth, pageScaledHeight);
-
-        console.log(
-          `Added page ${page + 1}/${totalPages}, sourceHeight: ${sourceHeight.toFixed(
-            1
-          )}px, scaledHeight: ${pageScaledHeight.toFixed(1)}pt`
-        );
       }
     }
 
-    pdf.save("alexandra-morgan-resume.pdf");
-
-    console.log("PDF generated successfully");
+    const fileName = formatNameForFilename(fullName);
+    pdf.save(`${fileName}_CV.pdf`);
     return { success: true, message: "PDF generated successfully!" };
   } catch (error) {
     console.error("Error generating PDF:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
     console.log(`Error generating PDF: ${errorMessage}. Please try again.`);
 
-    return { success: false, message: `Error generating PDF: ${errorMessage}. Please try again.` };
+    return {
+      success: false,
+      message: `Error generating PDF: ${errorMessage}. Please try again.`,
+    };
   }
 };

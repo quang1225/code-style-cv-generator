@@ -6,7 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -39,7 +45,13 @@ const useDebounce = (value: any, delay: number) => {
   return debouncedValue;
 };
 
-const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInline = false, disabled = false }) => {
+const ResumeForm: React.FC<ResumeFormProps> = ({
+  data,
+  onUpdate,
+  onClose,
+  isInline = false,
+  disabled = false,
+}) => {
   const [formData, setFormData] = useState<ResumeData>(data);
   const [activeTab, setActiveTab] = useState("personal");
 
@@ -61,21 +73,33 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
     setFormData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
-  const handleWorkExperienceChange = useCallback((index: number, field: string, value: string) => {
-    setFormData((prev) => {
-      const newWorkExperience = [...prev.workExperience];
-      newWorkExperience[index] = { ...newWorkExperience[index], [field]: value };
-      return { ...prev, workExperience: newWorkExperience };
-    });
-  }, []);
+  const handleWorkExperienceChange = useCallback(
+    (index: number, field: string, value: string) => {
+      setFormData((prev) => {
+        const newWorkExperience = [...prev.workExperience];
+        newWorkExperience[index] = {
+          ...newWorkExperience[index],
+          [field]: value,
+        };
+        return { ...prev, workExperience: newWorkExperience };
+      });
+    },
+    []
+  );
 
-  const handleCustomSectionChange = useCallback((sectionIndex: number, field: string, value: string) => {
-    setFormData((prev) => {
-      const newCustomSections = [...prev.customSections];
-      newCustomSections[sectionIndex] = { ...newCustomSections[sectionIndex], [field]: value };
-      return { ...prev, customSections: newCustomSections };
-    });
-  }, []);
+  const handleCustomSectionChange = useCallback(
+    (sectionIndex: number, field: string, value: string) => {
+      setFormData((prev) => {
+        const newCustomSections = [...prev.customSections];
+        newCustomSections[sectionIndex] = {
+          ...newCustomSections[sectionIndex],
+          [field]: value,
+        };
+        return { ...prev, customSections: newCustomSections };
+      });
+    },
+    []
+  );
 
   const handleCustomSectionItemChange = useCallback(
     (sectionIndex: number, itemIndex: number, field: string, value: string) => {
@@ -83,7 +107,10 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
         const newCustomSections = [...prev.customSections];
         const newItems = [...newCustomSections[sectionIndex].items];
         newItems[itemIndex] = { ...newItems[itemIndex], [field]: value };
-        newCustomSections[sectionIndex] = { ...newCustomSections[sectionIndex], items: newItems };
+        newCustomSections[sectionIndex] = {
+          ...newCustomSections[sectionIndex],
+          items: newItems,
+        };
         return { ...prev, customSections: newCustomSections };
       });
     },
@@ -93,7 +120,10 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
   const addWorkExperience = useCallback(() => {
     setFormData((prev) => ({
       ...prev,
-      workExperience: [...prev.workExperience, { position: "", company: "", period: "", description: "" }],
+      workExperience: [
+        ...prev.workExperience,
+        { position: "", company: "", period: "", description: "" },
+      ],
     }));
   }, []);
 
@@ -112,7 +142,14 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
         {
           id: Date.now().toString(),
           title: "",
-          items: [{ id: Date.now().toString(), title: "", description: "", period: "" }],
+          items: [
+            {
+              id: Date.now().toString(),
+              title: "",
+              description: "",
+              period: "",
+            },
+          ],
         },
       ],
     }));
@@ -139,28 +176,36 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
     });
   }, []);
 
-  const removeCustomSectionItem = useCallback((sectionIndex: number, itemIndex: number) => {
-    setFormData((prev) => {
-      const newCustomSections = [...prev.customSections];
-      newCustomSections[sectionIndex] = {
-        ...newCustomSections[sectionIndex],
-        items: newCustomSections[sectionIndex].items.filter((_, i) => i !== itemIndex),
-      };
-      return { ...prev, customSections: newCustomSections };
-    });
-  }, []);
+  const removeCustomSectionItem = useCallback(
+    (sectionIndex: number, itemIndex: number) => {
+      setFormData((prev) => {
+        const newCustomSections = [...prev.customSections];
+        newCustomSections[sectionIndex] = {
+          ...newCustomSections[sectionIndex],
+          items: newCustomSections[sectionIndex].items.filter(
+            (_, i) => i !== itemIndex
+          ),
+        };
+        return { ...prev, customSections: newCustomSections };
+      });
+    },
+    []
+  );
 
-  const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setFormData((prev) => ({ ...prev, avatar: result }));
-      };
-      reader.readAsDataURL(file);
-    }
-  }, []);
+  const handleImageUpload = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const result = e.target?.result as string;
+          setFormData((prev) => ({ ...prev, avatar: result }));
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    []
+  );
 
   const formContent = (
     <div className={isInline ? "" : "p-6"}>
@@ -179,7 +224,9 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
             <Checkbox
               id="show-copyright"
               checked={formData.showCopyright}
-              onCheckedChange={(checked) => handleBooleanChange("showCopyright", checked === true)}
+              onCheckedChange={(checked) =>
+                handleBooleanChange("showCopyright", checked === true)
+              }
             />
             <Label htmlFor="show-copyright" className="text-sm font-normal">
               Show watermark
@@ -206,7 +253,11 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                         className="w-16 h-16 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden cursor-pointer hover:bg-gray-200 transition-colors"
                       >
                         {formData.avatar ? (
-                          <img src={formData.avatar} alt="Profile" className="w-full h-full object-cover" />
+                          <img
+                            src={formData.avatar}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
                         ) : (
                           <User className="w-6 h-6 text-gray-400" />
                         )}
@@ -227,7 +278,9 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                         className="hidden"
                       />
                       <div className="text-sm text-gray-600">
-                        <p className="font-medium">Upload your profile picture</p>
+                        <p className="font-medium">
+                          Upload your profile picture
+                        </p>
                         <p className="text-xs">JPG, PNG or GIF (max 5MB)</p>
                       </div>
                     </div>
@@ -239,7 +292,9 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                     id="full-name"
                     type="text"
                     value={formData.name}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("name", e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange("name", e.target.value)
+                    }
                     className="mt-2"
                     placeholder="Enter your full name"
                   />
@@ -250,7 +305,9 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                     id="professional-title"
                     type="text"
                     value={formData.title}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("title", e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange("title", e.target.value)
+                    }
                     className="mt-2"
                     placeholder="e.g., Senior Software Engineer"
                   />
@@ -261,9 +318,50 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                     id="location"
                     type="text"
                     value={formData.location}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("location", e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange("location", e.target.value)
+                    }
                     className="mt-2"
                     placeholder="e.g., San Francisco, CA"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="year-of-birth">Year of Birth</Label>
+                  <Input
+                    id="year-of-birth"
+                    type="text"
+                    value={formData.yearOfBirth}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange("yearOfBirth", e.target.value)
+                    }
+                    className="mt-2"
+                    placeholder="e.g., 1995"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="gender">Gender</Label>
+                  <Input
+                    id="gender"
+                    type="text"
+                    value={formData.gender}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange("gender", e.target.value)
+                    }
+                    className="mt-2"
+                    placeholder="e.g., Male, Female"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange("phone", e.target.value)
+                    }
+                    className="mt-2"
+                    placeholder="e.g., +84 707777161"
                   />
                 </div>
                 <div>
@@ -272,20 +370,11 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                     id="email"
                     type="email"
                     value={formData.email}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("email", e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange("email", e.target.value)
+                    }
                     className="mt-2"
                     placeholder="your.email@example.com"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="website">Website</Label>
-                  <Input
-                    id="website"
-                    type="url"
-                    value={formData.website}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("website", e.target.value)}
-                    className="mt-2"
-                    placeholder="https://yourwebsite.com"
                   />
                 </div>
                 <div>
@@ -306,7 +395,12 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-medium">Work Experience</h3>
-                  <Button type="button" onClick={addWorkExperience} variant="outline" size="sm">
+                  <Button
+                    type="button"
+                    onClick={addWorkExperience}
+                    variant="outline"
+                    size="sm"
+                  >
                     Add Experience
                   </Button>
                 </div>
@@ -314,7 +408,9 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                   <Card key={index}>
                     <CardHeader className="pb-3">
                       <div className="flex justify-between items-start">
-                        <CardTitle className="text-base">Experience {index + 1}</CardTitle>
+                        <CardTitle className="text-base">
+                          Experience {index + 1}
+                        </CardTitle>
                         <Button
                           type="button"
                           onClick={() => removeWorkExperience(index)}
@@ -333,7 +429,13 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                             id={`position-${index}`}
                             type="text"
                             value={exp.position}
-                            onChange={(e) => handleWorkExperienceChange(index, "position", e.target.value)}
+                            onChange={(e) =>
+                              handleWorkExperienceChange(
+                                index,
+                                "position",
+                                e.target.value
+                              )
+                            }
                             className="mt-1"
                             placeholder="Job title"
                           />
@@ -344,7 +446,13 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                             id={`company-${index}`}
                             type="text"
                             value={exp.company}
-                            onChange={(e) => handleWorkExperienceChange(index, "company", e.target.value)}
+                            onChange={(e) =>
+                              handleWorkExperienceChange(
+                                index,
+                                "company",
+                                e.target.value
+                              )
+                            }
                             className="mt-1"
                             placeholder="Company name"
                           />
@@ -355,17 +463,31 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                             id={`period-${index}`}
                             type="text"
                             value={exp.period}
-                            onChange={(e) => handleWorkExperienceChange(index, "period", e.target.value)}
+                            onChange={(e) =>
+                              handleWorkExperienceChange(
+                                index,
+                                "period",
+                                e.target.value
+                              )
+                            }
                             className="mt-1"
                             placeholder="e.g., 2020-2023"
                           />
                         </div>
                         <div className="col-span-2">
-                          <Label htmlFor={`description-${index}`}>Description</Label>
+                          <Label htmlFor={`description-${index}`}>
+                            Description
+                          </Label>
                           <div className="mt-1">
                             <RichTextEditor
                               value={exp.description}
-                              onChange={(value) => handleWorkExperienceChange(index, "description", value)}
+                              onChange={(value) =>
+                                handleWorkExperienceChange(
+                                  index,
+                                  "description",
+                                  value
+                                )
+                              }
                               placeholder="Describe your role and achievements. Use the toolbar to format your text."
                             />
                           </div>
@@ -381,7 +503,12 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-medium">Right Side Sections</h3>
-                  <Button type="button" onClick={addCustomSection} variant="outline" size="sm">
+                  <Button
+                    type="button"
+                    onClick={addCustomSection}
+                    variant="outline"
+                    size="sm"
+                  >
                     Add Section
                   </Button>
                 </div>
@@ -389,7 +516,9 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                   <Card key={section.id}>
                     <CardHeader className="pb-3">
                       <div className="flex justify-between items-start">
-                        <CardTitle className="text-base">Section {sectionIndex + 1}</CardTitle>
+                        <CardTitle className="text-base">
+                          Section {sectionIndex + 1}
+                        </CardTitle>
                         <Button
                           type="button"
                           onClick={() => removeCustomSection(sectionIndex)}
@@ -402,12 +531,20 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div>
-                        <Label htmlFor={`section-title-${sectionIndex}`}>Section Title</Label>
+                        <Label htmlFor={`section-title-${sectionIndex}`}>
+                          Section Title
+                        </Label>
                         <Input
                           id={`section-title-${sectionIndex}`}
                           type="text"
                           value={section.title}
-                          onChange={(e) => handleCustomSectionChange(sectionIndex, "title", e.target.value)}
+                          onChange={(e) =>
+                            handleCustomSectionChange(
+                              sectionIndex,
+                              "title",
+                              e.target.value
+                            )
+                          }
                           className="mt-1"
                           placeholder="e.g., Awards, Certifications, etc."
                         />
@@ -426,12 +563,22 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                           </Button>
                         </div>
                         {section.items.map((item, itemIndex) => (
-                          <div key={item.id} className="border rounded-lg p-4 space-y-3">
+                          <div
+                            key={item.id}
+                            className="border rounded-lg p-4 space-y-3"
+                          >
                             <div className="flex justify-between items-start">
-                              <h4 className="text-sm font-medium text-foreground">Item {itemIndex + 1}</h4>
+                              <h4 className="text-sm font-medium text-foreground">
+                                Item {itemIndex + 1}
+                              </h4>
                               <Button
                                 type="button"
-                                onClick={() => removeCustomSectionItem(sectionIndex, itemIndex)}
+                                onClick={() =>
+                                  removeCustomSectionItem(
+                                    sectionIndex,
+                                    itemIndex
+                                  )
+                                }
                                 variant="destructive"
                                 size="sm"
                               >
@@ -440,26 +587,48 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <Label htmlFor={`item-title-${sectionIndex}-${itemIndex}`}>Title</Label>
+                                <Label
+                                  htmlFor={`item-title-${sectionIndex}-${itemIndex}`}
+                                >
+                                  Title
+                                </Label>
                                 <Input
                                   id={`item-title-${sectionIndex}-${itemIndex}`}
                                   type="text"
                                   value={item.title}
-                                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                    handleCustomSectionItemChange(sectionIndex, itemIndex, "title", e.target.value)
+                                  onChange={(
+                                    e: React.ChangeEvent<HTMLInputElement>
+                                  ) =>
+                                    handleCustomSectionItemChange(
+                                      sectionIndex,
+                                      itemIndex,
+                                      "title",
+                                      e.target.value
+                                    )
                                   }
                                   placeholder="e.g., Award Name"
                                   className="mt-1"
                                 />
                               </div>
                               <div>
-                                <Label htmlFor={`item-period-${sectionIndex}-${itemIndex}`}>Period</Label>
+                                <Label
+                                  htmlFor={`item-period-${sectionIndex}-${itemIndex}`}
+                                >
+                                  Period
+                                </Label>
                                 <Input
                                   id={`item-period-${sectionIndex}-${itemIndex}`}
                                   type="text"
                                   value={item.period}
-                                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                    handleCustomSectionItemChange(sectionIndex, itemIndex, "period", e.target.value)
+                                  onChange={(
+                                    e: React.ChangeEvent<HTMLInputElement>
+                                  ) =>
+                                    handleCustomSectionItemChange(
+                                      sectionIndex,
+                                      itemIndex,
+                                      "period",
+                                      e.target.value
+                                    )
                                   }
                                   placeholder="e.g., 2023"
                                   className="mt-1"
@@ -467,12 +636,21 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
                               </div>
                             </div>
                             <div>
-                              <Label htmlFor={`item-description-${sectionIndex}-${itemIndex}`}>Description</Label>
+                              <Label
+                                htmlFor={`item-description-${sectionIndex}-${itemIndex}`}
+                              >
+                                Description
+                              </Label>
                               <div className="mt-1">
                                 <RichTextEditor
                                   value={item.description}
                                   onChange={(value) =>
-                                    handleCustomSectionItemChange(sectionIndex, itemIndex, "description", value)
+                                    handleCustomSectionItemChange(
+                                      sectionIndex,
+                                      itemIndex,
+                                      "description",
+                                      value
+                                    )
                                   }
                                   placeholder="Enter item description. Use the toolbar to format your text."
                                 />
@@ -496,7 +674,9 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ data, onUpdate, onClose, isInli
     formContent
   ) : (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">{formContent}</div>
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        {formContent}
+      </div>
     </div>
   );
 };

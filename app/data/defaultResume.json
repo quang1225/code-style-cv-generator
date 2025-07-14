@@ -1,0 +1,112 @@
+{
+  "name": "Lê Hồng Quang",
+  "title": "Senior Frontend Engineer",
+  "location": "Vietnam",
+  "yearOfBirth": "1995",
+  "gender": "Male",
+  "phone": "+84 707777161",
+  "email": "quang1225@gmail.com",
+  "avatar": "/default_avatar.png",
+  "summary": "Always want to research new technology and share knowledge with other team members. Be a team-player, not a know-it-all man.<br><br>My strengths are <strong>UI/UX</strong>, building <strong>scalable web apps</strong> + <strong>reusable components/packages</strong> and <strong>monitoring, optimizing web performance</strong>.<br><br>Playing with <strong>Gen AI</strong> is my hobbies now.",
+  "showCopyright": true,
+  "workExperience": [
+    {
+      "position": "Software Engineer",
+      "company": "GRAB Taxi",
+      "period": "09/2023 - now",
+      "description": "<strong style=\"color: #4ade80; font-size: 1.1em;\">Coban UI</strong> - An app for managing data streaming infrastructure and pipelines.<br>• <strong>Impact:</strong> PIC. The only person in VN who takes responsibility, collects requirements, syncs meetings, and communicates with developers abroad to finish the OKRs.<br>• <strong>Tech stack:</strong> React, Ant Design, React Flow, Redux, Webpack, Module Federation (Micro FE), Framer Motion, Jest.<br><br><strong style=\"color: #4ade80; font-size: 1.1em;\">react-structured-search</strong> - A NPM library for quickly integrating autocomplete search queries with dynamic suggestions.<br>• <strong>Impact:</strong> PIC. Helps other portals quickly integrate the global search for many resources.<br>• <strong>Tech stack:</strong> NPM, React, Typescript, Webpack, Storybook.<br><br><strong style=\"color: #4ade80; font-size: 1.1em;\">@web-platform/build-tool</strong> - A NPM library for quickly integrating autocomplete search queries with dynamic suggestions.<br>• <strong>Impact:</strong> PIC. Simplify and streamline the build process for frontend projects across Grab. Enhance efficiency and productivity for other developers. More than 50 apps in Grab are using this tool.<br>• <strong>Tech stack:</strong> NPM, Webpack, RSpack, Babel, CLI, Typescript, Module Federation (Micro FE)."
+    },
+    {
+      "position": "Frontend Engineer",
+      "company": "FETCH Vietnam",
+      "period": "08/2020 - 08/2022",
+      "description": "<strong style=\"color: #4ade80; font-size: 1.1em;\">Maven</strong> - A video hosting platform.<br>• <strong>Impact:</strong> PIC, build from scratch the Front-end<br>• <strong>Tech stack:</strong> NextJS (SSR) and deploy Serverless environment (Vercel, AWS Amplify, AWS Cloudfront). Auth0 to authenticate multiple apps on multiple domains. ReactJS (Hooks and Functional Components), Redux, Redux Saga, Typescript.<br><br><strong style=\"color: #4ade80; font-size: 1.1em;\">GoFox</strong> - A Blockchain NFT marketplace.<br>• <strong>Impact:</strong> PIC. Build from scratch the Front-end, maintain the Back-end and setup CI/CD.<br>• <strong>Tech stack:</strong> MERN stack, Back-end with ExpressJS + MongoDB + Swagger Docs. Front-end with ReactJS (Hooks) + Material UI + @reduxjs/toolkit + Typescript + ESLint + Styled Components + Web3/Ethers + Solidity Smart Contract on Ethereum and BSC network.<br><br><strong style=\"color: #4ade80; font-size: 1.1em;\">FunArcade</strong> - A Bitcoin gambling website.<br>• <strong>Impact:</strong> PIC. Build from scratch the Front-end.<br>• <strong>Tech stack:</strong> ReactJS (Hooks) + Material UI + Redux, Redux Saga + SocketIO + Reselect + Immutable + Typescript + ESLint + Styled Components.<br><br><strong style=\"color: #4ade80; font-size: 1.1em;\">slack-mcp-ai-assistant</strong> - A Slack bot that integrates with Model Context Protocol (MCP) servers to provide AI-powered assistance with access to various tools and services.<br>• <strong>Impact:</strong> Personal project. Open source contribution to the MCP ecosystem.<br>• <strong>Tech stack:</strong> LLM, Gen AI, MCP Servers, Slack API, Git.<br><br><strong style=\"color: #4ade80; font-size: 1.1em;\">Code Style CV Generator</strong> - An app to generate developer-style CVs with a terminal/code-like design.<br>• <strong>Impact:</strong> Personal project. Create a unique CV generation tool for developers.<br>• <strong>Tech stack:</strong> NextJS, Tailwind CSS, Typescript, shadcn/ui, CSS Animation.<br>• <strong>URL:</strong> https://code-style-cv-generator.quang.work"
+    },
+    {
+      "position": "Junior Full-stack Developer",
+      "company": "TMG Thien Minh Group",
+      "period": "07/2018 - 07/2020",
+      "description": "<strong style=\"color: #4ade80; font-size: 1.1em;\">iVIVU Member</strong> - An authentication and authorization, user point reward system.<br>• <strong>Impact:</strong> PIC, build from scratch the Front-end<br>• <strong>Tech stack:</strong> Angular, jQuery, Bootstrap, and Back-end with Restful API .NET Core (JWT + Refresh Token)<br><br><strong style=\"color: #4ade80; font-size: 1.1em;\">iVIVU Trai Nghiem</strong> - A review of hot foods, hotels, and travel places websites<br>• <strong>Impact:</strong> PIC, build from scratch the Front-end<br>• <strong>Tech stack:</strong> Angular Universal (SSR), jQuery, Bootstrap<br><br><strong style=\"color: #4ade80; font-size: 1.1em;\">iVIVU Lunch</strong> - A food booking website<br>• <strong>Impact:</strong> PIC, build from scratch the Front-end<br>• <strong>Tech stack:</strong> Angular Universal, jQuery, Bootstrap"
+    },
+    {
+      "position": "Junior Front-end Developer",
+      "company": "FPT Software",
+      "period": "06/2016 - 06/2018",
+      "description": "<strong style=\"color: #4ade80; font-size: 1.1em;\">Olay Skin Advisor</strong> - A sub-function of Olay.com. Build front-end with .NET MVC.<br>• <strong>Impact:</strong> Supporter. Maintain UI for the feature. Convert HTML templates from PSD, Sketches, and Figma.<br>• <strong>Tech stack:</strong> .NET MVC, MySQL.<br>• Gain experience in a professional Agile process in a big outsourcing company with 15+ team size"
+    }
+  ],
+  "customSections": [
+    {
+      "id": "0",
+      "title": "Links",
+      "items": [
+        {
+          "id": "1",
+          "title": "Github",
+          "description": "https://github.com/quang1225",
+          "period": ""
+        },
+        {
+          "id": "2",
+          "title": "Website",
+          "description": "https://quang.work",
+          "period": ""
+        }
+      ]
+    },
+    {
+      "id": "1",
+      "title": "Skills",
+      "items": [
+        {
+          "id": "1",
+          "title": "Frontend Technologies",
+          "description": "• <strong>10+ years of experience</strong> in Front-end<br>• <strong>NextJS/React/TypeScript</strong> - Main stack<br>• <strong>Functional Components</strong>, <strong>React Hooks</strong><br>• <strong>UI/UX</strong>, building scalable web apps<br>• <strong>Reusable components/packages</strong>",
+          "period": ""
+        },
+        {
+          "id": "2",
+          "title": "Development & DevOps",
+          "description": "• <strong>Git Flow</strong>, <strong>SSR</strong>, <strong>SEO</strong><br>• <strong>Cloud DevOps (CI/CD)</strong><br>• <strong>Architectural mindset</strong><br>• <strong>Clean + reusable + scalable components</strong>",
+          "period": ""
+        },
+        {
+          "id": "3",
+          "title": "Performance & Optimization",
+          "description": "• <strong>Web debugging</strong>, <strong>performance profiling</strong><br>• <strong>Google Lighthouse</strong>, <strong>React Dev Tool</strong><br>• <strong>GTmetrix</strong>, <strong>WebPageTest</strong><br>• <strong>Reduce side effects</strong> for minimum re-render",
+          "period": ""
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "title": "Education",
+      "items": [
+        {
+          "id": "1",
+          "title": "Bachelor of Information Technology",
+          "description": "<strong>University of Technology</strong><br><br>• <strong>Major:</strong> Information Technology<br>• <em>4-year degree program</em>",
+          "period": "10/2013 - 10/2017"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "title": "Additional Skills",
+      "items": [
+        {
+          "id": "1",
+          "title": "Languages",
+          "description": "<strong>English:</strong><br>• <strong>Good reading, writing (8/10)</strong><br>• <em>General verbal communication (7/10)</em>",
+          "period": ""
+        },
+        {
+          "id": "2",
+          "title": "Project Management",
+          "description": "• <strong>Deep understand GIT Flow</strong><br>• <strong>Jira</strong>, <strong>Slack</strong> experience<br>• <strong>Agile methodology</strong><br>• <em>Scrum process</em>",
+          "period": ""
+        }
+      ]
+    }
+  ]
+}

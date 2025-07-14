@@ -43,7 +43,12 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
 
     // If text contains HTML tags, render as HTML
     if (text.includes("<")) {
-      return <div className="resume-rich-text" dangerouslySetInnerHTML={{ __html: text }} />;
+      return (
+        <div
+          className="resume-rich-text"
+          dangerouslySetInnerHTML={{ __html: text }}
+        />
+      );
     }
     // Otherwise, treat as plain text with line breaks
     return text.split("\n").map((line, index) => (
@@ -52,6 +57,30 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
         {index < text.split("\n").length - 1 && <br />}
       </React.Fragment>
     ));
+  };
+
+  const formatLinkText = (text: string) => {
+    // Safety check for undefined/null text
+    if (!text || typeof text !== "string") {
+      return null;
+    }
+
+    // Check if text is a URL
+    if (text.startsWith("http://") || text.startsWith("https://")) {
+      return (
+        <a
+          href={text}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-400 hover:text-blue-300 underline"
+        >
+          {text}
+        </a>
+      );
+    }
+
+    // Otherwise, treat as regular text
+    return formatText(text);
   };
 
   return (
@@ -68,7 +97,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
           width: "794px", // A4 width in pixels (21cm at 96 DPI)
           margin: "0 auto",
           borderRadius: "8px",
-          boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+          boxShadow:
+            "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
         }}
       >
         {/* Copyright text at top right border */}
@@ -92,7 +122,11 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
             <div className="flex items-center gap-6 mb-4">
               <div className="shrink-0">
                 {data.avatar ? (
-                  <img src={data.avatar} alt="Profile" className="w-24 h-24 rounded-full border-2 border-green-400" />
+                  <img
+                    src={data.avatar}
+                    alt="Profile"
+                    className="w-24 h-24 rounded-full border-2 border-green-400"
+                  />
                 ) : (
                   <div className="w-24 h-24 rounded-full bg-gray-600 border-2 border-green-400 flex items-center justify-center"></div>
                 )}
@@ -107,22 +141,24 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                 <div className="text-sm text-gray-400">{data.title}</div>
               </div>
               <div className="text-left text-xs text-gray-300 space-y-1">
+                {data.yearOfBirth && (
+                  <div>
+                    <span>Year of Birth: {data.yearOfBirth}</span>
+                  </div>
+                )}
+                {data.gender && (
+                  <div>
+                    <span>Gender: {data.gender}</span>
+                  </div>
+                )}
+                {data.phone && (
+                  <div>
+                    <span>Phone: {data.phone}</span>
+                  </div>
+                )}
                 {data.email && (
                   <div>
                     <span>Email: {data.email}</span>
-                  </div>
-                )}
-                {data.website && (
-                  <div>
-                    <span>Website: </span>
-                    <a
-                      href={data.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 underline"
-                    >
-                      {data.website}
-                    </a>
                   </div>
                 )}
               </div>
@@ -136,7 +172,11 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
               style={{ paddingTop: "1px", width: "36px", flexShrink: 0 }}
             >
               {Array.from({ length: lineCount }, (_, i) => (
-                <div key={i} className="text-right" style={{ lineHeight: "1.25", height: "20px" }}>
+                <div
+                  key={i}
+                  className="text-right"
+                  style={{ lineHeight: "1.25", height: "20px" }}
+                >
                   {i + 1}
                 </div>
               ))}
@@ -148,26 +188,46 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
               <div className="flex-1 space-y-6">
                 {/* Summary */}
                 <section>
-                  <h2 className="text-orange-400 text-base font-bold mb-3">/summary</h2>
-                  <div className="text-gray-300 leading-relaxed text-xs">{formatText(data.summary)}</div>
+                  <h2 className="text-orange-400 text-base font-bold mb-3">
+                    /summary
+                  </h2>
+                  <div className="text-gray-300 leading-relaxed text-xs">
+                    {formatText(data.summary)}
+                  </div>
                 </section>
 
                 {/* Work Experience */}
                 <section>
-                  <h2 className="text-orange-400 text-base font-bold mb-3">/work experience</h2>
+                  <h2 className="text-orange-400 text-base font-bold mb-3">
+                    /work experience
+                  </h2>
                   <div className="space-y-4">
                     {data.workExperience?.map((job, index) => (
                       <div key={index} className="mb-4">
                         <div className="mb-2">
                           <div className="flex justify-between items-start mb-1 gap-2">
-                            <h3 className="text-white font-semibold text-sm flex-1">{job.position}</h3>
-                            <span className="text-green-400 font-bold text-sm prevent-period-break whitespace-nowrap">
+                            <h3 className="text-white font-semibold text-sm flex-1">
+                              {job.position}
+                            </h3>
+                            <span
+                              className="font-bold text-sm prevent-period-break whitespace-nowrap"
+                              style={{ color: "#8b5cf6" }}
+                            >
                               {job.period}
                             </span>
                           </div>
-                          <p className="text-gray-400 text-sm">{job.company}</p>
+                          <p className="text-gray-400 text-sm">
+                            <span
+                              style={{ color: "#ef4444" }}
+                              className="font-semibold"
+                            >
+                              {job.company}
+                            </span>
+                          </p>
                         </div>
-                        <div className="text-gray-300 text-xs leading-relaxed">{formatText(job.description)}</div>
+                        <div className="text-gray-300 text-xs leading-relaxed">
+                          {formatText(job.description)}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -179,24 +239,35 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                 {/* Custom Sections */}
                 {data.customSections?.map((section, index) => (
                   <section key={section.id}>
-                    <h2 className="text-orange-400 text-base font-bold mb-3">/{section.title.toLowerCase()}</h2>
+                    <h2 className="text-orange-400 text-base font-bold mb-3">
+                      /{section.title.toLowerCase()}
+                    </h2>
                     <div className="space-y-4">
                       {section.items?.map((item, itemIndex) => (
                         <div key={item.id} className="mb-4">
                           <div className="mb-2">
                             <div className="flex justify-between items-start mb-1 gap-2">
                               {item.title && (
-                                <h3 className="text-white font-semibold text-sm flex-1 min-w-0">{item.title}</h3>
+                                <h3 className="text-white font-semibold text-sm flex-1 min-w-0">
+                                  {item.title}
+                                </h3>
                               )}
                               {item.period && (
-                                <span className="text-green-400 font-bold text-sm prevent-period-break whitespace-nowrap shrink-0">
+                                <span
+                                  className="font-bold text-sm prevent-period-break whitespace-nowrap shrink-0"
+                                  style={{ color: "#8b5cf6" }}
+                                >
                                   {item.period}
                                 </span>
                               )}
                             </div>
                           </div>
                           {item.description && (
-                            <div className="text-gray-300 text-xs leading-relaxed">{formatText(item.description)}</div>
+                            <div className="text-gray-300 text-xs leading-relaxed">
+                              {section.title.toLowerCase() === "links"
+                                ? formatLinkText(item.description)
+                                : formatText(item.description)}
+                            </div>
                           )}
                         </div>
                       ))}

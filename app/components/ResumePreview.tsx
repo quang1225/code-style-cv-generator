@@ -154,12 +154,12 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
           <div className="absolute top-2 left-1/2 transform -translate-x-1/2 text-[11px] text-gray-600 font-normal whitespace-nowrap z-10">
             CV made with{" "}
             <a
-              href="https://code-style-cv-generator.quang.work/"
+              href="https://code-style-cv-generator.quang.work"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-600 hover:text-gray-500"
+              className="text-gray-600 hover:text-gray-500 underline"
             >
-              https://code-style-cv-generator.quang.work/
+              https://code-style-cv-generator.quang.work
             </a>
           </div>
         )}
@@ -211,7 +211,9 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                 )}
                 {data.location && (
                   <div>
-                    <span className="whitespace-nowrap">📍 Location: {data.location}</span>
+                    <span className="whitespace-nowrap">
+                      📍 Location: {data.location}
+                    </span>
                   </div>
                 )}
               </div>

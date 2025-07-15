@@ -218,9 +218,15 @@ export const generatePDF = async (
       }
     }
 
-    // Save the PDF
+    // Save the PDF with date
     const fileName = formatNameForFilename(fullName);
-    pdf.save(`${fileName}_CV.pdf`);
+    const currentDate = new Date();
+    const day = String(currentDate.getDate()).padStart(2, "0");
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+    const year = currentDate.getFullYear();
+    const dateStr = `${day}_${month}_${year}`;
+
+    pdf.save(`${fileName}_CV-${dateStr}.pdf`);
 
     return { success: true, message: "PDF generated successfully!" };
   } catch (error) {

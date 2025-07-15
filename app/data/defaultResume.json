@@ -61,7 +61,7 @@
         {
           "id": "1",
           "title": "Frontend Technologies",
-          "description": "<p>- <strong>10+ years of experience</strong> in Front-end. My main stack is NextJS/ React/ TypeScript. Thorough understanding of Functional Components, React Hooks.</p><p><br></p><p>- Have experience with <strong>SSR</strong>, SEO, and <strong>DevOps</strong> ( CI/CD ).</p><p><br></p><p>- Have an <strong>architectural mindset</strong>, making clean + reusable + scalable components.</p><p><br></p><p>- Knowledge of web debugging, <strong>performance profiling</strong> and optimization ( using metric tools like Google Lighthouse, React Dev Tool, GTmetrix, WebPageTest..., to reduce <strong>side effects</strong> for minimum re-render... ).</p>",
+          "description": "<p>- <strong>10+ years of experience</strong> in Front-end. My main stack is NextJS/ React/ TypeScript. Thorough understanding of Functional Components, React Hooks.</p><p><br></p><p>- Have experience with <strong>SSR</strong>, SEO, Socket.io, <strong>Webpack</strong>, Babel, NPM management.</p><p><br></p><p>- Have experience working with <strong style=\"color: rgb(235, 214, 255);\">Gen AI</strong> tools ( Cursor IDE, ChatGPT, Claude Code, MCP Servers )</p><p><br></p><p>- Have an <strong>architectural mindset</strong>, making clean + reusable + scalable components.</p><p><br></p><p>- Knowledge of web debugging, <strong>performance profiling</strong> and optimization ( using metric tools like Google Lighthouse, React Dev Tool, GTmetrix, WebPageTest..., to reduce <strong>side effects</strong> for minimum re-render... ).</p>",
           "period": ""
         }
       ]
@@ -97,7 +97,7 @@
         {
           "id": "1752541848037",
           "title": "Cloud",
-          "description": "<p>- <strong>Azure </strong>( setup Environment Slots, CICD on Azure DevOps and Github Action ).</p><p>- <strong>AWS</strong> ( deploy to AWS S3, AWS Lambda. Setup CICD. config AWS Cloudfront ).</p><p>- <strong>Google </strong>Cloud ( setup Pipeline CICD using App Engine + Docker ).</p>",
+          "description": "<p>- <strong>Azure </strong>( setup Environment Slots, CICD on Azure DevOps and Github Action ).</p><p>- <strong>AWS</strong> ( deploy to AWS S3, AWS Lambda. Setup CICD. config AWS Cloudfront ).</p><p>- <strong>Google Cloud</strong> ( setup Pipeline CICD using App Engine + Docker ).</p><p>- <strong>GitLab CI/CD</strong> ( setup pipelines using YAML files ).</p><p>- <strong>GitHub Action</strong> ( setup workflows using YAML files ).</p>",
           "period": ""
         }
       ]
@@ -109,7 +109,7 @@
         {
           "id": "1752542008459",
           "title": "",
-          "description": "<p><span style=\"color: rgb(255, 255, 255);\">Traveling, Football, Film Making, Singing, Team gathering.</span></p>",
+          "description": "<p>✈️ Traveling, 🏕️ Camping, ⚽ Football, 📽️ Short Film Making, 🎤 Singing, 🍻 Team gathering.</p>",
           "period": ""
         }
       ]

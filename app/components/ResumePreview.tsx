@@ -131,7 +131,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
   };
 
   return (
-    <div className="mx-2">
+    <div className="mx-2 flex justify-center">
       <div
         id="resume-content"
         className="text-sm font-mono shadow-2xl relative"
@@ -139,10 +139,10 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
           backgroundColor: "#2d3748",
           color: "#4fd1c7",
           fontFamily: "Monaco, Menlo, monospace",
-          padding: "2rem 0", // Reduced padding for more space
+          padding: "2rem", // Consolidated padding for consistency
           minHeight: "1122px", // A4 height in pixels (29.7cm at 96 DPI)
           width: "794px", // A4 width in pixels (21cm at 96 DPI)
-          margin: "0 auto",
+          margin: "0", // Remove auto margin to prevent left space in PDF
           borderRadius: "8px",
           boxShadow:
             "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
@@ -163,7 +163,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
           </div>
         )}
 
-        <div style={{ padding: "0 2rem" }}>
+        <div>
           {/* Terminal Header */}
           <div className="mb-8">
             <div className="flex items-center gap-6 mb-4">
@@ -217,7 +217,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="resume-body flex gap-4">
             {/* Line Numbers */}
             <div
               ref={lineNumbersRef}
@@ -243,17 +243,11 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
 
             {/* Content */}
             <div
-              className="resume-main-content flex gap-6 flex-1 flex-wrap flex-col"
+              className="resume-main-content flex gap-6 flex-1 min-w-0"
               ref={contentRef}
             >
               {/* Left Column */}
-              <div
-                className="space-y-6"
-                style={{
-                  flex: "1 1 calc(50% - 0.5rem)",
-                  width: "calc(50% - 0.5rem)",
-                }}
-              >
+              <div className="space-y-6 flex-1 min-w-0">
                 {/* Summary */}
                 <section>
                   <h2 className="text-orange-400 text-base font-bold mb-3">
@@ -303,13 +297,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
               </div>
 
               {/* Right Column */}
-              <div
-                className="space-y-6"
-                style={{
-                  flex: "1 1 calc(50% - 0.5rem)",
-                  width: "calc(50% - 0.5rem)",
-                }}
-              >
+              <div className="space-y-6 flex-1 min-w-0">
                 {/* Custom Sections */}
                 {data.customSections?.map((section, index) => (
                   <section key={section.id}>

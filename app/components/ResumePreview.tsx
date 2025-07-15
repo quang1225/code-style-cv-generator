@@ -150,7 +150,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
       >
         {/* Copyright text at top right border */}
         {data.showCopyright && (
-          <div className="absolute top-2 right-2 text-[11px] text-gray-600 font-normal whitespace-nowrap z-10">
+          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 text-[11px] text-gray-600 font-normal whitespace-nowrap z-10">
             CV made with{" "}
             <a
               href="https://code-style-cv-generator.quang.work/"
@@ -190,22 +190,27 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
               <div className="text-left text-xs text-gray-300 space-y-1">
                 {data.yearOfBirth && (
                   <div>
-                    <span>Year of Birth: {data.yearOfBirth}</span>
+                    <span>🎂 Year of Birth: {data.yearOfBirth}</span>
                   </div>
                 )}
                 {data.gender && (
                   <div>
-                    <span>Gender: {data.gender}</span>
+                    <span>👤 Gender: {data.gender}</span>
                   </div>
                 )}
                 {data.phone && (
                   <div>
-                    <span>Phone: {data.phone}</span>
+                    <span>📱 Phone: {data.phone}</span>
                   </div>
                 )}
                 {data.email && (
                   <div>
-                    <span>Email: {data.email}</span>
+                    <span>📧 Email: {data.email}</span>
+                  </div>
+                )}
+                {data.location && (
+                  <div>
+                    <span>📍 Location: {data.location}</span>
                   </div>
                 )}
               </div>
@@ -219,7 +224,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
               className="text-gray-600 text-xs leading-relaxed overflow-hidden"
               style={{
                 paddingTop: "1px",
-                width: "36px",
+                width: "24px",
                 flexShrink: 0,
                 display: "flex",
                 flexDirection: "column",
@@ -237,9 +242,18 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
             </div>
 
             {/* Content */}
-            <div className="flex gap-8 flex-1" ref={contentRef}>
+            <div
+              className="resume-main-content flex gap-6 flex-1 flex-wrap flex-col"
+              ref={contentRef}
+            >
               {/* Left Column */}
-              <div className="flex-1 space-y-6">
+              <div
+                className="space-y-6"
+                style={{
+                  flex: "1 1 calc(50% - 0.5rem)",
+                  width: "calc(50% - 0.5rem)",
+                }}
+              >
                 {/* Summary */}
                 <section>
                   <h2 className="text-orange-400 text-base font-bold mb-3">
@@ -275,7 +289,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                               style={{ color: "#ef4444" }}
                               className="font-semibold"
                             >
-                              {job.company}
+                              🏢 {job.company}
                             </span>
                           </p>
                         </div>
@@ -289,7 +303,13 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
               </div>
 
               {/* Right Column */}
-              <div className="flex-1 space-y-6 min-w-0">
+              <div
+                className="space-y-6"
+                style={{
+                  flex: "1 1 calc(50% - 0.5rem)",
+                  width: "calc(50% - 0.5rem)",
+                }}
+              >
                 {/* Custom Sections */}
                 {data.customSections?.map((section, index) => (
                   <section key={section.id}>

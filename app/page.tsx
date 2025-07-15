@@ -133,7 +133,7 @@ export default function Home() {
           </div>
 
           {/* Right side - Preview (1/2 size on mobile, full size on desktop) */}
-          <div className="w-full md:w-[40%] hover:w-[950px] peer smooth-expand cursor-pointer">
+          <div className="w-full w-[950px] peer smooth-expand cursor-pointer">
             <Card className="smooth-expand hover:shadow-2xl">
               <CardHeader>
                 <CardTitle>Preview</CardTitle>

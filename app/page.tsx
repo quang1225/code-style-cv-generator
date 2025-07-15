@@ -132,17 +132,19 @@ export default function Home() {
             </Card>
           </div>
 
-          {/* Right side - Preview (1/2 size on mobile, full size on desktop) */}
-          <div className="w-full w-[950px] peer smooth-expand cursor-pointer">
+          {/* Right side - Preview (responsive on mobile, full size on desktop) */}
+          <div className="w-full md:w-[40%] hover:w-[950px] peer smooth-expand cursor-pointer">
             <Card className="smooth-expand hover:shadow-2xl">
               <CardHeader>
                 <CardTitle>Preview</CardTitle>
                 <CardDescription>Live preview of your resume</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="overflow-auto max-h-[400px] md:max-h-[800px]">
-                  <div className="transform scale-50 md:scale-100 origin-top-left w-[397px] md:w-full h-[561px] md:h-auto">
-                    <ResumePreview data={resumeData} />
+                <div className="overflow-x-auto overflow-y-auto max-h-[400px] md:max-h-[800px]">
+                  <div className="w-full md:w-auto min-w-fit">
+                    <div className="transform scale-[0.47] sm:scale-[0.6] md:scale-100 origin-top-left w-fit md:w-full h-[527px] sm:h-[673px] md:h-auto">
+                      <ResumePreview data={resumeData} />
+                    </div>
                   </div>
                 </div>
               </CardContent>

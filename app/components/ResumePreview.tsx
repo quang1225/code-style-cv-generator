@@ -131,7 +131,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
   };
 
   return (
-    <div className="mx-2 flex justify-center">
+    <div className="w-fit">
       <div
         id="resume-content"
         className="text-sm font-mono shadow-2xl relative"
@@ -141,7 +141,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
           fontFamily: "Monaco, Menlo, monospace",
           padding: "2rem", // Consolidated padding for consistency
           minHeight: "1122px", // A4 height in pixels (29.7cm at 96 DPI)
-          width: "794px", // A4 width in pixels (21cm at 96 DPI)
+          minWidth: "794px", // A4 width in pixels (21cm at 96 DPI)
+          width: "794px", // Fixed width to prevent flex issues
           margin: "0", // Remove auto margin to prevent left space in PDF
           borderRadius: "8px",
           boxShadow:
@@ -166,7 +167,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
         <div>
           {/* Terminal Header */}
           <div className="mb-8">
-            <div className="flex items-center gap-6 mb-4">
+            <div className="flex items-center flex-wrap gap-6 mb-4">
               <div className="shrink-0">
                 {data.avatar ? (
                   <img
@@ -187,7 +188,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                 <div className="text-2xl text-white font-bold">{data.name}</div>
                 <div className="text-sm text-gray-400">{data.title}</div>
               </div>
-              <div className="text-left text-xs text-gray-300 space-y-1">
+              <div className="basic-info text-left text-xs text-gray-300 space-y-1">
                 {data.yearOfBirth && (
                   <div>
                     <span>🎂 Year of Birth: {data.yearOfBirth}</span>
@@ -210,7 +211,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                 )}
                 {data.location && (
                   <div>
-                    <span>📍 Location: {data.location}</span>
+                    <span className="whitespace-nowrap">📍 Location: {data.location}</span>
                   </div>
                 )}
               </div>
@@ -243,7 +244,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
 
             {/* Content */}
             <div
-              className="resume-main-content flex gap-6 flex-1 min-w-0"
+              className="resume-main-content flex gap-6 flex-1 min-w-0 h-fit"
               ref={contentRef}
             >
               {/* Left Column */}

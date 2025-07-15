@@ -141,7 +141,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto overflow-y-auto max-h-[400px] md:max-h-[800px]">
-                  <div className="w-full md:w-auto min-w-fit">
+                  <div className="w-full md:w-auto">
                     <div className="transform scale-[0.47] sm:scale-[0.6] md:scale-100 origin-top-left w-fit md:w-full h-[527px] sm:h-[673px] md:h-auto">
                       <ResumePreview data={resumeData} />
                     </div>

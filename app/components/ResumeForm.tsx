@@ -2,14 +2,26 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { ResumeData } from "../types/resume";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Camera, User, Plus, X, Download, Upload } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Camera, User, X, Download, Upload, AlertCircle } from "lucide-react";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import RichTextEditor from "./RichTextEditor";
 import ReactCrop, { Crop, PixelCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
@@ -24,22 +36,41 @@ interface ResumeFormProps {
   disabled?: boolean;
 }
 
-// Debounce hook for performance optimization
-const useDebounce = (value: any, delay: number) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-};
+// Define the form schema using Zod that matches ResumeData interface exactly
+const resumeSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  title: z.string().min(1, "Title is required"),
+  location: z.string().min(1, "Location is required"),
+  yearOfBirth: z.string().min(1, "Year of birth is required"),
+  gender: z.string().min(1, "Gender is required"),
+  phone: z.string().min(1, "Phone is required"),
+  email: z.string().email("Invalid email address"),
+  avatar: z.string().optional(),
+  summary: z.string().min(1, "Summary is required"),
+  showCopyright: z.boolean(),
+  workExperience: z.array(
+    z.object({
+      position: z.string().min(1, "Position is required"),
+      company: z.string().min(1, "Company is required"),
+      period: z.string().min(1, "Period is required"),
+      description: z.string().min(1, "Description is required"),
+    })
+  ),
+  customSections: z.array(
+    z.object({
+      id: z.string(),
+      title: z.string().min(1, "Section title is required"),
+      items: z.array(
+        z.object({
+          id: z.string(),
+          title: z.string().min(1, "Item title is required"),
+          description: z.string().min(1, "Item description is required"),
+          period: z.string(),
+        })
+      ),
+    })
+  ),
+});
 
 const ResumeForm: React.FC<ResumeFormProps> = ({
   data,
@@ -49,8 +80,11 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
   disabled = false,
 }) => {
   const { theme } = useTheme();
-  const [formData, setFormData] = useState<ResumeData>(data);
   const [activeTab, setActiveTab] = useState("personal");
+  const [backupMessage, setBackupMessage] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
   // Crop related states
   const [showCropModal, setShowCropModal] = useState(false);
@@ -71,142 +105,27 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
     useState<ResumeData | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Debounced form data for performance optimization
-  const debouncedFormData = useDebounce(formData, 300);
+  // Initialize form with react-hook-form
+  const form = useForm<ResumeData>({
+    resolver: zodResolver(resumeSchema),
+    defaultValues: data,
+    mode: "onChange",
+  });
 
-  // Update parent component when debounced data changes
+  // Watch form values to trigger updates
+  const formValues = form.watch();
+
+  // Update parent component when form values change
   useEffect(() => {
-    if (JSON.stringify(debouncedFormData) !== JSON.stringify(data)) {
-      onUpdate(debouncedFormData);
+    if (JSON.stringify(formValues) !== JSON.stringify(data)) {
+      onUpdate(formValues as ResumeData);
     }
-  }, [debouncedFormData, onUpdate, data]);
+  }, [formValues, onUpdate, data]);
 
-  const handleInputChange = useCallback((field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  }, []);
-
-  const handleBooleanChange = useCallback((field: string, value: boolean) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  }, []);
-
-  const handleWorkExperienceChange = useCallback(
-    (index: number, field: string, value: string) => {
-      setFormData((prev) => {
-        const newWorkExperience = [...prev.workExperience];
-        newWorkExperience[index] = {
-          ...newWorkExperience[index],
-          [field]: value,
-        };
-        return { ...prev, workExperience: newWorkExperience };
-      });
-    },
-    []
-  );
-
-  const handleCustomSectionChange = useCallback(
-    (sectionIndex: number, field: string, value: string) => {
-      setFormData((prev) => {
-        const newCustomSections = [...prev.customSections];
-        newCustomSections[sectionIndex] = {
-          ...newCustomSections[sectionIndex],
-          [field]: value,
-        };
-        return { ...prev, customSections: newCustomSections };
-      });
-    },
-    []
-  );
-
-  const handleCustomSectionItemChange = useCallback(
-    (sectionIndex: number, itemIndex: number, field: string, value: string) => {
-      setFormData((prev) => {
-        const newCustomSections = [...prev.customSections];
-        const newItems = [...newCustomSections[sectionIndex].items];
-        newItems[itemIndex] = { ...newItems[itemIndex], [field]: value };
-        newCustomSections[sectionIndex] = {
-          ...newCustomSections[sectionIndex],
-          items: newItems,
-        };
-        return { ...prev, customSections: newCustomSections };
-      });
-    },
-    []
-  );
-
-  const addWorkExperience = useCallback(() => {
-    setFormData((prev) => ({
-      ...prev,
-      workExperience: [
-        ...prev.workExperience,
-        { position: "", company: "", period: "", description: "" },
-      ],
-    }));
-  }, []);
-
-  const removeWorkExperience = useCallback((index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      workExperience: prev.workExperience.filter((_, i) => i !== index),
-    }));
-  }, []);
-
-  const addCustomSection = useCallback(() => {
-    setFormData((prev) => ({
-      ...prev,
-      customSections: [
-        ...prev.customSections,
-        {
-          id: Date.now().toString(),
-          title: "",
-          items: [
-            {
-              id: Date.now().toString(),
-              title: "",
-              description: "",
-              period: "",
-            },
-          ],
-        },
-      ],
-    }));
-  }, []);
-
-  const removeCustomSection = useCallback((index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      customSections: prev.customSections.filter((_, i) => i !== index),
-    }));
-  }, []);
-
-  const addCustomSectionItem = useCallback((sectionIndex: number) => {
-    setFormData((prev) => {
-      const newCustomSections = [...prev.customSections];
-      newCustomSections[sectionIndex] = {
-        ...newCustomSections[sectionIndex],
-        items: [
-          ...newCustomSections[sectionIndex].items,
-          { id: Date.now().toString(), title: "", description: "", period: "" },
-        ],
-      };
-      return { ...prev, customSections: newCustomSections };
-    });
-  }, []);
-
-  const removeCustomSectionItem = useCallback(
-    (sectionIndex: number, itemIndex: number) => {
-      setFormData((prev) => {
-        const newCustomSections = [...prev.customSections];
-        newCustomSections[sectionIndex] = {
-          ...newCustomSections[sectionIndex],
-          items: newCustomSections[sectionIndex].items.filter(
-            (_, i) => i !== itemIndex
-          ),
-        };
-        return { ...prev, customSections: newCustomSections };
-      });
-    },
-    []
-  );
+  // Reset form when data prop changes
+  useEffect(() => {
+    form.reset(data);
+  }, [data, form]);
 
   const calculateSquareCrop = useCallback((img: HTMLImageElement) => {
     const { width, height } = img;
@@ -232,7 +151,6 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
           const result = e.target?.result as string;
           setOriginalImage(result);
           setShowCropModal(true);
-          // Reset crop state - will be set properly when image loads
           setCrop({
             unit: "%",
             x: 0,
@@ -244,7 +162,6 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
         };
         reader.readAsDataURL(file);
       }
-      // Reset the file input value to allow selecting the same file again
       e.target.value = "";
     },
     []
@@ -295,10 +212,10 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
     if (!imgRef.current || !completedCrop) return;
 
     const croppedImage = await getCroppedImg(imgRef.current, completedCrop);
-    setFormData((prev) => ({ ...prev, avatar: croppedImage }));
+    form.setValue("avatar", croppedImage);
     setShowCropModal(false);
     setOriginalImage("");
-  }, [completedCrop, getCroppedImg]);
+  }, [completedCrop, getCroppedImg, form]);
 
   const handleCropCancel = useCallback(() => {
     setShowCropModal(false);
@@ -313,10 +230,11 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
     setCompletedCrop(undefined as any);
   }, []);
 
-  // Backup functionality - download current form data as JSON
+  // Backup functionality
   const handleBackup = useCallback(() => {
     try {
-      const dataStr = JSON.stringify(formData, null, 2);
+      const currentData = form.getValues();
+      const dataStr = JSON.stringify(currentData, null, 2);
       const dataUri =
         "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
 
@@ -328,12 +246,24 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
       linkElement.setAttribute("href", dataUri);
       linkElement.setAttribute("download", exportFileDefaultName);
       linkElement.click();
+
+      setBackupMessage({
+        type: "success",
+        message: "Resume backup downloaded successfully!",
+      });
     } catch (error) {
       console.error("Error backing up resume data:", error);
+      setBackupMessage({
+        type: "error",
+        message: "Failed to backup resume data. Please try again.",
+      });
     }
-  }, [formData]);
 
-  // Restore functionality - upload JSON file and populate form
+    // Auto-hide message after 3 seconds
+    setTimeout(() => setBackupMessage(null), 3000);
+  }, [form]);
+
+  // Restore functionality
   const handleRestoreClick = useCallback(() => {
     fileInputRef.current?.click();
   }, []);
@@ -362,14 +292,16 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
           setShowConfirmRestore(true);
         } catch (error) {
           console.error("Error parsing JSON file:", error);
-          alert(
-            "Invalid JSON file format. Please make sure you selected a valid resume backup file."
-          );
+          setBackupMessage({
+            type: "error",
+            message:
+              "Invalid JSON file format. Please select a valid resume backup file.",
+          });
+          setTimeout(() => setBackupMessage(null), 5000);
         }
       };
 
       reader.readAsText(file);
-      // Reset file input to allow selecting the same file again
       event.target.value = "";
     },
     []
@@ -377,16 +309,102 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
 
   const handleConfirmRestore = useCallback(() => {
     if (pendingRestoreData) {
-      setFormData(pendingRestoreData);
+      form.reset(pendingRestoreData);
       setShowConfirmRestore(false);
       setPendingRestoreData(null);
+      setBackupMessage({
+        type: "success",
+        message: "Resume data restored successfully!",
+      });
+      setTimeout(() => setBackupMessage(null), 3000);
     }
-  }, [pendingRestoreData]);
+  }, [pendingRestoreData, form]);
 
   const handleCancelRestore = useCallback(() => {
     setShowConfirmRestore(false);
     setPendingRestoreData(null);
   }, []);
+
+  // Form field helpers
+  const addWorkExperience = useCallback(() => {
+    const currentExperience = form.getValues("workExperience");
+    form.setValue("workExperience", [
+      ...currentExperience,
+      { position: "", company: "", period: "", description: "" },
+    ]);
+  }, [form]);
+
+  const removeWorkExperience = useCallback(
+    (index: number) => {
+      const currentExperience = form.getValues("workExperience");
+      form.setValue(
+        "workExperience",
+        currentExperience.filter((_: any, i: number) => i !== index)
+      );
+    },
+    [form]
+  );
+
+  const addCustomSection = useCallback(() => {
+    const currentSections = form.getValues("customSections");
+    form.setValue("customSections", [
+      ...currentSections,
+      {
+        id: Date.now().toString(),
+        title: "",
+        items: [
+          {
+            id: Date.now().toString(),
+            title: "",
+            description: "",
+            period: "",
+          },
+        ],
+      },
+    ]);
+  }, [form]);
+
+  const removeCustomSection = useCallback(
+    (index: number) => {
+      const currentSections = form.getValues("customSections");
+      form.setValue(
+        "customSections",
+        currentSections.filter((_: any, i: number) => i !== index)
+      );
+    },
+    [form]
+  );
+
+  const addCustomSectionItem = useCallback(
+    (sectionIndex: number) => {
+      const currentSections = form.getValues("customSections");
+      const newSections = [...currentSections];
+      newSections[sectionIndex] = {
+        ...newSections[sectionIndex],
+        items: [
+          ...newSections[sectionIndex].items,
+          { id: Date.now().toString(), title: "", description: "", period: "" },
+        ],
+      };
+      form.setValue("customSections", newSections);
+    },
+    [form]
+  );
+
+  const removeCustomSectionItem = useCallback(
+    (sectionIndex: number, itemIndex: number) => {
+      const currentSections = form.getValues("customSections");
+      const newSections = [...currentSections];
+      newSections[sectionIndex] = {
+        ...newSections[sectionIndex],
+        items: newSections[sectionIndex].items.filter(
+          (_: any, i: number) => i !== itemIndex
+        ),
+      };
+      form.setValue("customSections", newSections);
+    },
+    [form]
+  );
 
   const formContent = (
     <div className={isInline ? "" : "p-6"}>
@@ -399,499 +417,568 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
         </div>
       )}
 
-      <div className={`${disabled ? "opacity-50 pointer-events-none" : ""}`}>
-        <div className="mb-4">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="show-copyright"
-              checked={formData.showCopyright}
-              onCheckedChange={(checked) =>
-                handleBooleanChange("showCopyright", checked === true)
-              }
+      <Form {...form}>
+        <form className="space-y-6">
+          <div
+            className={`${disabled ? "opacity-50 pointer-events-none" : ""}`}
+          >
+            {/* Backup/Restore Alert */}
+            {backupMessage && (
+              <Alert
+                variant={
+                  backupMessage.type === "error" ? "destructive" : "default"
+                }
+                className="mb-4"
+              >
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{backupMessage.message}</AlertDescription>
+              </Alert>
+            )}
+
+            {/* Show Copyright Checkbox */}
+            <FormField
+              control={form.control}
+              name="showCopyright"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center space-x-3 space-y-0 mb-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormLabel className="text-sm font-normal">
+                    Show watermark
+                  </FormLabel>
+                </FormItem>
+              )}
             />
-            <Label htmlFor="show-copyright" className="text-sm font-normal">
-              Show watermark
-            </Label>
-          </div>
-        </div>
 
-        {/* Backup/Restore Section */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium">Backup & Restore</Label>
-            <div className="flex space-x-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleBackup}
-                disabled={disabled}
-                className="flex items-center space-x-2"
-              >
-                <Download className="w-4 h-4" />
-                <span>Backup</span>
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleRestoreClick}
-                disabled={disabled}
-                className="flex items-center space-x-2"
-              >
-                <Upload className="w-4 h-4" />
-                <span>Restore</span>
-              </Button>
+            {/* Backup/Restore Section */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between">
+                <FormLabel className="text-sm font-medium">
+                  Backup & Restore
+                </FormLabel>
+                <div className="flex space-x-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleBackup}
+                    disabled={disabled}
+                    className="flex items-center space-x-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Backup</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRestoreClick}
+                    disabled={disabled}
+                    className="flex items-center space-x-2"
+                  >
+                    <Upload className="w-4 h-4" />
+                    <span>Restore</span>
+                  </Button>
+                </div>
+              </div>
+              <FormDescription className="mt-1">
+                Backup your current resume data to a JSON file, or restore from
+                a previously saved backup.
+              </FormDescription>
             </div>
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Backup your current resume data to a JSON file, or restore from a
-            previously saved backup.
-          </p>
-        </div>
 
-        {/* Hidden file input for restore */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".json"
-          onChange={handleRestoreFileSelect}
-          className="hidden"
-        />
+            {/* Hidden file input for restore */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={handleRestoreFileSelect}
+              className="hidden"
+            />
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="personal">Personal</TabsTrigger>
-            <TabsTrigger value="work">Work</TabsTrigger>
-            <TabsTrigger value="custom">Sections</TabsTrigger>
-          </TabsList>
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-full"
+            >
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="personal">Personal</TabsTrigger>
+                <TabsTrigger value="work">Work</TabsTrigger>
+                <TabsTrigger value="custom">Sections</TabsTrigger>
+              </TabsList>
 
-          <div className="mt-6">
-            <TabsContent value="personal" className="space-y-4">
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="profile-picture">Profile Picture</Label>
-                  <div className="mt-2 flex items-center space-x-4">
-                    <div className="relative">
-                      <label
-                        htmlFor="profile-picture"
-                        className="w-16 h-16 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden cursor-pointer hover:bg-gray-200 transition-colors"
-                      >
-                        {formData.avatar ? (
-                          <img
-                            src={formData.avatar}
-                            alt="Profile"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <User className="w-6 h-6 text-gray-400" />
-                        )}
-                      </label>
-                      <label
-                        htmlFor="profile-picture"
-                        className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1 cursor-pointer hover:bg-primary/90 transition-colors"
-                      >
-                        <Camera className="w-3 h-3" />
-                      </label>
-                    </div>
-                    <div className="flex-1">
-                      <Input
-                        id="profile-picture"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                      />
-                      <div className="text-sm text-gray-600">
-                        <p className="font-medium">
-                          Upload your profile picture
-                        </p>
-                        <p className="text-xs">JPG, PNG or GIF (max 5MB)</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="full-name">Full Name</Label>
-                  <Input
-                    id="full-name"
-                    type="text"
-                    value={formData.name}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange("name", e.target.value)
-                    }
-                    className="mt-2"
-                    placeholder="Enter your full name"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="professional-title">Professional Title</Label>
-                  <Input
-                    id="professional-title"
-                    type="text"
-                    value={formData.title}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange("title", e.target.value)
-                    }
-                    className="mt-2"
-                    placeholder="e.g., Senior Software Engineer"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="location">Location</Label>
-                  <Input
-                    id="location"
-                    type="text"
-                    value={formData.location}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange("location", e.target.value)
-                    }
-                    className="mt-2"
-                    placeholder="e.g., San Francisco, CA"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="year-of-birth">Year of Birth</Label>
-                  <Input
-                    id="year-of-birth"
-                    type="text"
-                    value={formData.yearOfBirth}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange("yearOfBirth", e.target.value)
-                    }
-                    className="mt-2"
-                    placeholder="e.g., 1995"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="gender">Gender</Label>
-                  <Input
-                    id="gender"
-                    type="text"
-                    value={formData.gender}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange("gender", e.target.value)
-                    }
-                    className="mt-2"
-                    placeholder="e.g., Male, Female"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange("phone", e.target.value)
-                    }
-                    className="mt-2"
-                    placeholder="e.g., +84 707777161"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange("email", e.target.value)
-                    }
-                    className="mt-2"
-                    placeholder="your.email@example.com"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="summary">Summary</Label>
-                  <div className="mt-2">
-                    <RichTextEditor
-                      value={formData.summary}
-                      onChange={(value) => handleInputChange("summary", value)}
-                      placeholder="Write a brief summary of your experience and skills. Use the toolbar to format your text."
-                      className="mt-1"
+              <div className="mt-6">
+                <TabsContent value="personal" className="space-y-4">
+                  <div className="space-y-4">
+                    {/* Profile Picture */}
+                    <FormField
+                      control={form.control}
+                      name="avatar"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Profile Picture</FormLabel>
+                          <FormControl>
+                            <div className="flex items-center space-x-4">
+                              <div className="relative">
+                                <label
+                                  htmlFor="profile-picture"
+                                  className="w-16 h-16 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden cursor-pointer hover:bg-gray-200 transition-colors"
+                                >
+                                  {field.value ? (
+                                    <img
+                                      src={field.value}
+                                      alt="Profile"
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <User className="w-6 h-6 text-gray-400" />
+                                  )}
+                                </label>
+                                <label
+                                  htmlFor="profile-picture"
+                                  className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1 cursor-pointer hover:bg-primary/90 transition-colors"
+                                >
+                                  <Camera className="w-3 h-3" />
+                                </label>
+                              </div>
+                              <div className="flex-1">
+                                <Input
+                                  id="profile-picture"
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={handleImageUpload}
+                                  className="hidden"
+                                />
+                                <FormDescription>
+                                  <span className="font-medium">
+                                    Upload your profile picture
+                                  </span>
+                                  <br />
+                                  <span className="text-xs">
+                                    JPG, PNG or GIF (max 5MB)
+                                  </span>
+                                </FormDescription>
+                              </div>
+                            </div>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Name */}
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Full Name</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter your full name"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Title */}
+                    <FormField
+                      control={form.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Professional Title</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., Senior Software Engineer"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Location */}
+                    <FormField
+                      control={form.control}
+                      name="location"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Location</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., San Francisco, CA"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Year of Birth */}
+                    <FormField
+                      control={form.control}
+                      name="yearOfBirth"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Year of Birth</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g., 1995" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Gender */}
+                    <FormField
+                      control={form.control}
+                      name="gender"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Gender</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., Male, Female"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Phone */}
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., +84 707777161"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Email */}
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              placeholder="your.email@example.com"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Summary */}
+                    <FormField
+                      control={form.control}
+                      name="summary"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Summary</FormLabel>
+                          <FormControl>
+                            <RichTextEditor
+                              value={field.value}
+                              onChange={field.onChange}
+                              placeholder="Write a brief summary of your experience and skills. Use the toolbar to format your text."
+                              className="mt-1"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
-                </div>
-              </div>
-            </TabsContent>
+                </TabsContent>
 
-            <TabsContent value="work" className="space-y-6">
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-medium">Work Experience</h3>
-                  <Button
-                    type="button"
-                    onClick={addWorkExperience}
-                    variant="outline"
-                    size="sm"
-                  >
-                    Add Experience
-                  </Button>
-                </div>
-                {formData.workExperience.map((exp, index) => (
-                  <Card key={index}>
-                    <CardHeader className="pb-3">
-                      <div className="flex justify-between items-start">
-                        <CardTitle className="text-base">
-                          Experience {index + 1}
-                        </CardTitle>
-                        <Button
-                          type="button"
-                          onClick={() => removeWorkExperience(index)}
-                          variant="destructive"
-                          size="sm"
-                        >
-                          Remove
-                        </Button>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor={`position-${index}`}>Position</Label>
-                          <Input
-                            id={`position-${index}`}
-                            type="text"
-                            value={exp.position}
-                            onChange={(e) =>
-                              handleWorkExperienceChange(
-                                index,
-                                "position",
-                                e.target.value
-                              )
-                            }
-                            className="mt-1"
-                            placeholder="Job title"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor={`company-${index}`}>Company</Label>
-                          <Input
-                            id={`company-${index}`}
-                            type="text"
-                            value={exp.company}
-                            onChange={(e) =>
-                              handleWorkExperienceChange(
-                                index,
-                                "company",
-                                e.target.value
-                              )
-                            }
-                            className="mt-1"
-                            placeholder="Company name"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor={`period-${index}`}>Period</Label>
-                          <Input
-                            id={`period-${index}`}
-                            type="text"
-                            value={exp.period}
-                            onChange={(e) =>
-                              handleWorkExperienceChange(
-                                index,
-                                "period",
-                                e.target.value
-                              )
-                            }
-                            className="mt-1"
-                            placeholder="e.g., 2020-2023"
-                          />
-                        </div>
-                        <div className="col-span-2">
-                          <Label htmlFor={`description-${index}`}>
-                            Description
-                          </Label>
-                          <div className="mt-1">
-                            <RichTextEditor
-                              value={exp.description}
-                              onChange={(value) =>
-                                handleWorkExperienceChange(
-                                  index,
-                                  "description",
-                                  value
-                                )
-                              }
-                              placeholder="Describe your role and achievements. Use the toolbar to format your text."
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </TabsContent>
+                <TabsContent value="work" className="space-y-6">
+                  <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-lg font-medium">Work Experience</h3>
+                      <Button
+                        type="button"
+                        onClick={addWorkExperience}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Add Experience
+                      </Button>
+                    </div>
 
-            <TabsContent value="custom" className="space-y-6">
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-medium">Right Side Sections</h3>
-                  <Button
-                    type="button"
-                    onClick={addCustomSection}
-                    variant="outline"
-                    size="sm"
-                  >
-                    Add Section
-                  </Button>
-                </div>
-                {formData.customSections.map((section, sectionIndex) => (
-                  <Card key={section.id}>
-                    <CardHeader className="pb-3">
-                      <div className="flex justify-between items-start">
-                        <CardTitle className="text-base">
-                          Section {sectionIndex + 1}
-                        </CardTitle>
-                        <Button
-                          type="button"
-                          onClick={() => removeCustomSection(sectionIndex)}
-                          variant="destructive"
-                          size="sm"
-                        >
-                          Remove Section
-                        </Button>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
-                        <Label htmlFor={`section-title-${sectionIndex}`}>
-                          Section Title
-                        </Label>
-                        <Input
-                          id={`section-title-${sectionIndex}`}
-                          type="text"
-                          value={section.title}
-                          onChange={(e) =>
-                            handleCustomSectionChange(
-                              sectionIndex,
-                              "title",
-                              e.target.value
-                            )
-                          }
-                          className="mt-1"
-                          placeholder="e.g., Awards, Certifications, etc."
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <Label>Items</Label>
-                          <Button
-                            type="button"
-                            onClick={() => addCustomSectionItem(sectionIndex)}
-                            variant="outline"
-                            size="sm"
-                          >
-                            <Plus className="w-4 h-4 mr-1" />
-                            Add Item
-                          </Button>
-                        </div>
-                        {section.items.map((item, itemIndex) => (
-                          <div
-                            key={item.id}
-                            className="border rounded-lg p-4 space-y-3"
-                          >
+                    {form
+                      .watch("workExperience")
+                      ?.map((exp: any, index: number) => (
+                        <Card key={index}>
+                          <CardHeader className="pb-3">
                             <div className="flex justify-between items-start">
-                              <h4 className="text-sm font-medium text-foreground">
-                                Item {itemIndex + 1}
-                              </h4>
+                              <CardTitle className="text-base">
+                                Experience {index + 1}
+                              </CardTitle>
+                              <Button
+                                type="button"
+                                onClick={() => removeWorkExperience(index)}
+                                variant="destructive"
+                                size="sm"
+                              >
+                                Remove
+                              </Button>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                              <FormField
+                                control={form.control}
+                                name={`workExperience.${index}.position`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Position</FormLabel>
+                                    <FormControl>
+                                      <Input
+                                        placeholder="e.g., Senior Software Engineer"
+                                        {...field}
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={form.control}
+                                name={`workExperience.${index}.company`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Company</FormLabel>
+                                    <FormControl>
+                                      <Input
+                                        placeholder="e.g., Tech Corp"
+                                        {...field}
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                            <FormField
+                              control={form.control}
+                              name={`workExperience.${index}.period`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Period</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      placeholder="e.g., 01/2020 - 12/2023"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name={`workExperience.${index}.description`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Description</FormLabel>
+                                  <FormControl>
+                                    <RichTextEditor
+                                      value={field.value}
+                                      onChange={field.onChange}
+                                      placeholder="Describe your role, achievements, and responsibilities. Use the toolbar to format your text."
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </CardContent>
+                        </Card>
+                      ))}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="custom" className="space-y-6">
+                  <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-lg font-medium">Custom Sections</h3>
+                      <Button
+                        type="button"
+                        onClick={addCustomSection}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Add Section
+                      </Button>
+                    </div>
+
+                    {form
+                      .watch("customSections")
+                      ?.map((section: any, sectionIndex: number) => (
+                        <Card key={section.id}>
+                          <CardHeader className="pb-3">
+                            <div className="flex justify-between items-start">
+                              <CardTitle className="text-base">
+                                Section {sectionIndex + 1}
+                              </CardTitle>
                               <Button
                                 type="button"
                                 onClick={() =>
-                                  removeCustomSectionItem(
-                                    sectionIndex,
-                                    itemIndex
-                                  )
+                                  removeCustomSection(sectionIndex)
                                 }
                                 variant="destructive"
                                 size="sm"
                               >
-                                <X className="w-4 h-4" />
+                                Remove
                               </Button>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <Label
-                                  htmlFor={`item-title-${sectionIndex}-${itemIndex}`}
+                          </CardHeader>
+                          <CardContent className="space-y-4">
+                            <FormField
+                              control={form.control}
+                              name={`customSections.${sectionIndex}.title`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Section Title</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      placeholder="e.g., Skills, Education, Awards"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <div className="space-y-4">
+                              <div className="flex justify-between items-center">
+                                <h4 className="text-sm font-medium">Items</h4>
+                                <Button
+                                  type="button"
+                                  onClick={() =>
+                                    addCustomSectionItem(sectionIndex)
+                                  }
+                                  variant="outline"
+                                  size="sm"
                                 >
-                                  Title
-                                </Label>
-                                <Input
-                                  id={`item-title-${sectionIndex}-${itemIndex}`}
-                                  type="text"
-                                  value={item.title}
-                                  onChange={(
-                                    e: React.ChangeEvent<HTMLInputElement>
-                                  ) =>
-                                    handleCustomSectionItemChange(
-                                      sectionIndex,
-                                      itemIndex,
-                                      "title",
-                                      e.target.value
-                                    )
-                                  }
-                                  placeholder="e.g., Award Name"
-                                  className="mt-1"
-                                />
+                                  Add Item
+                                </Button>
                               </div>
-                              <div>
-                                <Label
-                                  htmlFor={`item-period-${sectionIndex}-${itemIndex}`}
-                                >
-                                  Period
-                                </Label>
-                                <Input
-                                  id={`item-period-${sectionIndex}-${itemIndex}`}
-                                  type="text"
-                                  value={item.period}
-                                  onChange={(
-                                    e: React.ChangeEvent<HTMLInputElement>
-                                  ) =>
-                                    handleCustomSectionItemChange(
-                                      sectionIndex,
-                                      itemIndex,
-                                      "period",
-                                      e.target.value
-                                    )
-                                  }
-                                  placeholder="e.g., 2023"
-                                  className="mt-1"
-                                />
-                              </div>
+
+                              {section.items.map(
+                                (item: any, itemIndex: number) => (
+                                  <div
+                                    key={item.id}
+                                    className="border rounded-lg p-4 space-y-4"
+                                  >
+                                    <div className="flex justify-between items-start">
+                                      <h5 className="text-sm font-medium">
+                                        Item {itemIndex + 1}
+                                      </h5>
+                                      <Button
+                                        type="button"
+                                        onClick={() =>
+                                          removeCustomSectionItem(
+                                            sectionIndex,
+                                            itemIndex
+                                          )
+                                        }
+                                        variant="destructive"
+                                        size="sm"
+                                      >
+                                        Remove
+                                      </Button>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                      <FormField
+                                        control={form.control}
+                                        name={`customSections.${sectionIndex}.items.${itemIndex}.title`}
+                                        render={({ field }) => (
+                                          <FormItem>
+                                            <FormLabel>Title</FormLabel>
+                                            <FormControl>
+                                              <Input
+                                                placeholder="e.g., Award Name"
+                                                {...field}
+                                              />
+                                            </FormControl>
+                                            <FormMessage />
+                                          </FormItem>
+                                        )}
+                                      />
+                                      <FormField
+                                        control={form.control}
+                                        name={`customSections.${sectionIndex}.items.${itemIndex}.period`}
+                                        render={({ field }) => (
+                                          <FormItem>
+                                            <FormLabel>Period</FormLabel>
+                                            <FormControl>
+                                              <Input
+                                                placeholder="e.g., 2023"
+                                                {...field}
+                                              />
+                                            </FormControl>
+                                            <FormMessage />
+                                          </FormItem>
+                                        )}
+                                      />
+                                    </div>
+                                    <FormField
+                                      control={form.control}
+                                      name={`customSections.${sectionIndex}.items.${itemIndex}.description`}
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>Description</FormLabel>
+                                          <FormControl>
+                                            <RichTextEditor
+                                              value={field.value}
+                                              onChange={field.onChange}
+                                              placeholder="Enter item description. Use the toolbar to format your text."
+                                            />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                  </div>
+                                )
+                              )}
                             </div>
-                            <div>
-                              <Label
-                                htmlFor={`item-description-${sectionIndex}-${itemIndex}`}
-                              >
-                                Description
-                              </Label>
-                              <div className="mt-1">
-                                <RichTextEditor
-                                  value={item.description}
-                                  onChange={(value) =>
-                                    handleCustomSectionItemChange(
-                                      sectionIndex,
-                                      itemIndex,
-                                      "description",
-                                      value
-                                    )
-                                  }
-                                  placeholder="Enter item description. Use the toolbar to format your text."
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                          </CardContent>
+                        </Card>
+                      ))}
+                  </div>
+                </TabsContent>
               </div>
-            </TabsContent>
+            </Tabs>
           </div>
-        </Tabs>
-      </div>
+        </form>
+      </Form>
     </div>
   );
 
@@ -957,7 +1044,6 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
                             imgRef.current
                           );
                           setCrop(squareCrop);
-                          // Set completedCrop to enable Apply button immediately
                           setCompletedCrop(squareCrop as PixelCrop);
                         }
                       }}

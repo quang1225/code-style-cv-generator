@@ -19,20 +19,67 @@ manual synchronization with the classes used here.
 
 const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
   const contentRef = useRef<HTMLDivElement>(null);
-  const [lineCount, setLineCount] = useState(50);
+  const lineNumbersRef = useRef<HTMLDivElement>(null);
+  const [lineCount, setLineCount] = useState(60); // Start with a reasonable default
 
   useEffect(() => {
-    try {
-      if (contentRef.current) {
-        const contentHeight = contentRef.current.scrollHeight;
-        const lineHeight = 20; // Adjusted line height to match actual rendered height
-        const calculatedLines = Math.ceil(contentHeight / lineHeight);
-        setLineCount(Math.max(calculatedLines + 5, 30)); // Add small buffer, minimum 30 lines, no max cap
+    const updateLineCount = () => {
+      if (contentRef.current && lineNumbersRef.current) {
+        // Wait for next frame to ensure DOM is updated
+        requestAnimationFrame(() => {
+          if (contentRef.current && lineNumbersRef.current) {
+            // Get the actual rendered height of the content
+            const contentHeight = contentRef.current.offsetHeight;
+            const lineHeight = 20; // Fixed line height in pixels
+
+            // Calculate exact number of lines needed, ensuring minimum
+            const neededLines = Math.max(
+              Math.ceil(contentHeight / lineHeight),
+              20
+            );
+
+            // Only update if there's a meaningful change
+            setLineCount((prevCount) => {
+              if (neededLines !== prevCount) {
+                return neededLines;
+              }
+              return prevCount;
+            });
+
+            // Ensure line numbers container matches content height exactly
+            lineNumbersRef.current.style.height = `${contentHeight}px`;
+          }
+        });
       }
-    } catch (error) {
-      console.error("Error calculating line count:", error);
-      setLineCount(30); // Fallback to default
+    };
+
+    // Delay initial measurement to ensure content is fully rendered
+    const initialTimeout = setTimeout(() => {
+      updateLineCount();
+    }, 100);
+
+    // Use ResizeObserver for more reliable updates
+    let resizeObserver: ResizeObserver | null = null;
+
+    if (window.ResizeObserver) {
+      resizeObserver = new ResizeObserver((entries) => {
+        // Debounce rapid resize events
+        requestAnimationFrame(() => {
+          updateLineCount();
+        });
+      });
+
+      if (contentRef.current) {
+        resizeObserver.observe(contentRef.current);
+      }
     }
+
+    return () => {
+      clearTimeout(initialTimeout);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+    };
   }, [data]);
 
   const formatText = (text: string) => {
@@ -168,13 +215,20 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
           <div className="flex gap-4">
             {/* Line Numbers */}
             <div
-              className="text-gray-600 text-xs leading-relaxed"
-              style={{ paddingTop: "1px", width: "36px", flexShrink: 0 }}
+              ref={lineNumbersRef}
+              className="text-gray-600 text-xs leading-relaxed overflow-hidden"
+              style={{
+                paddingTop: "1px",
+                width: "36px",
+                flexShrink: 0,
+                display: "flex",
+                flexDirection: "column",
+              }}
             >
               {Array.from({ length: lineCount }, (_, i) => (
                 <div
                   key={i}
-                  className="text-right"
+                  className="text-right flex-none"
                   style={{ lineHeight: "1.25", height: "20px" }}
                 >
                   {i + 1}
@@ -201,9 +255,9 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                   <h2 className="text-orange-400 text-base font-bold mb-3">
                     /work experience
                   </h2>
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     {data.workExperience?.map((job, index) => (
-                      <div key={index} className="mb-4">
+                      <div key={index} className="mb-6">
                         <div className="mb-2">
                           <div className="flex justify-between items-start mb-1 gap-2">
                             <h3 className="text-white font-semibold text-sm flex-1">

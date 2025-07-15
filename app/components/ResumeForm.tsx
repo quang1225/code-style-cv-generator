@@ -105,6 +105,11 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
     useState<ResumeData | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Debouncing mechanism
+  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitializedRef = useRef(false);
+  const lastDataRef = useRef<ResumeData>(data);
+
   // Initialize form with react-hook-form
   const form = useForm<ResumeData>({
     resolver: zodResolver(resumeSchema),
@@ -112,20 +117,53 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
     mode: "onChange",
   });
 
-  // Watch form values to trigger updates
+  // Debounced update function
+  const debouncedUpdate = useCallback(
+    (values: ResumeData) => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+
+      updateTimeoutRef.current = setTimeout(() => {
+        lastDataRef.current = values; // Track what we're sending to parent
+        console.log("Form updating parent with:", values.name, values.title); // Debug log
+        onUpdate(values);
+      }, 150); // Reduced to 150ms debounce delay for better responsiveness
+    },
+    [onUpdate]
+  );
+
+  // Watch form values for debounced updates
   const formValues = form.watch();
 
-  // Update parent component when form values change
+  // Handle form value changes with debouncing
   useEffect(() => {
-    if (JSON.stringify(formValues) !== JSON.stringify(data)) {
-      onUpdate(formValues as ResumeData);
+    // Skip the initial render to avoid unnecessary updates
+    if (!isInitializedRef.current) {
+      isInitializedRef.current = true;
+      return;
     }
-  }, [formValues, onUpdate, data]);
 
-  // Reset form when data prop changes
+    debouncedUpdate(formValues as ResumeData);
+  }, [formValues, debouncedUpdate]);
+
+  // Reset form when data prop changes from external source (not from our own updates)
   useEffect(() => {
-    form.reset(data);
+    // Only reset if the data is actually different from what we last sent
+    if (JSON.stringify(data) !== JSON.stringify(lastDataRef.current)) {
+      lastDataRef.current = data;
+      form.reset(data);
+    }
   }, [data, form]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const calculateSquareCrop = useCallback((img: HTMLImageElement) => {
     const { width, height } = img;
@@ -428,7 +466,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
                 variant={
                   backupMessage.type === "error" ? "destructive" : "default"
                 }
-                className="mb-4"
+                className="mb-4 animate-in fade-in-0 slide-in-from-top-2 duration-300"
               >
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{backupMessage.message}</AlertDescription>

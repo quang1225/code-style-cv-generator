@@ -62,6 +62,7 @@ export default function Home() {
   }, [resumeData.name]);
 
   const handleUpdateResume = useCallback((newData: ResumeData) => {
+    console.log("Main page received update:", newData.name, newData.title); // Debug log
     setResumeData(newData);
   }, []);
 
@@ -139,7 +140,7 @@ export default function Home() {
                 <CardTitle>Preview</CardTitle>
                 <CardDescription>Live preview of your resume</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-0 md:p-6">
                 <div className="overflow-x-auto overflow-y-auto max-h-[400px] md:max-h-[800px]">
                   <div className="w-full md:w-auto">
                     <div className="transform scale-[0.47] sm:scale-[0.6] md:scale-100 origin-top-left w-fit md:w-full h-[527px] sm:h-[673px] md:h-auto">

@@ -22,6 +22,11 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
   const lineNumbersRef = useRef<HTMLDivElement>(null);
   const [lineCount, setLineCount] = useState(60); // Start with a reasonable default
 
+  // Debug log for data updates
+  useEffect(() => {
+    console.log("ResumePreview received data update:", data.name, data.title);
+  }, [data]);
+
   useEffect(() => {
     const updateLineCount = () => {
       if (contentRef.current && lineNumbersRef.current) {

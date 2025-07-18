@@ -87,7 +87,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
     };
   }, [data]);
 
-  const formatText = (text: string) => {
+  const formatText = React.useCallback((text: string) => {
     // Safety check for undefined/null text
     if (!text || typeof text !== "string") {
       return null;
@@ -109,31 +109,34 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
         {index < text.split("\n").length - 1 && <br />}
       </React.Fragment>
     ));
-  };
+  }, []);
 
-  const formatLinkText = (text: string) => {
-    // Safety check for undefined/null text
-    if (!text || typeof text !== "string") {
-      return null;
-    }
+  const formatLinkText = React.useCallback(
+    (text: string) => {
+      // Safety check for undefined/null text
+      if (!text || typeof text !== "string") {
+        return null;
+      }
 
-    // Check if text is a URL
-    if (text.startsWith("http://") || text.startsWith("https://")) {
-      return (
-        <a
-          href={text}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-400 hover:text-blue-300 underline"
-        >
-          {text}
-        </a>
-      );
-    }
+      // Check if text is a URL
+      if (text.startsWith("http://") || text.startsWith("https://")) {
+        return (
+          <a
+            href={text}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-400 hover:text-blue-300 underline"
+          >
+            {text}
+          </a>
+        );
+      }
 
-    // Otherwise, treat as regular text
-    return formatText(text);
-  };
+      // Otherwise, treat as regular text
+      return formatText(text);
+    },
+    [formatText]
+  );
 
   return (
     <div className="w-fit">

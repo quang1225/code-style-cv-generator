@@ -62,7 +62,6 @@ export default function Home() {
   }, [resumeData.name]);
 
   const handleUpdateResume = useCallback((newData: ResumeData) => {
-    console.log("Main page received update:", newData.name, newData.title); // Debug log
     setResumeData(newData);
   }, []);
 

@@ -274,9 +274,9 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                   <h2 className="text-orange-400 text-base font-bold mb-3">
                     /work experience
                   </h2>
-                  <div className="space-y-6">
+                  <div className="flex flex-col gap-8">
                     {data.workExperience?.map((job, index) => (
-                      <div key={index} className="mb-6">
+                      <div key={index}>
                         <div className="mb-2">
                           <div className="flex justify-between items-start mb-1 gap-2">
                             <h3 className="text-white font-semibold text-sm flex-1">

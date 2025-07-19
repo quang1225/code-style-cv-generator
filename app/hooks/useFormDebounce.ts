@@ -17,23 +17,6 @@ export const useFormDebounce = ({
   const isInitializedRef = useRef(false);
   const lastDataRef = useRef<ResumeData | null>(null);
 
-  // Watch only specific fields that are likely to change frequently
-  const watchedFields = form.watch([
-    "name",
-    "title",
-    "location",
-    "yearOfBirth",
-    "gender",
-    "phone",
-    "email",
-    "summary",
-    "showCopyright",
-    "avatar",
-  ]);
-
-  const workExperience = form.watch("workExperience");
-  const customSections = form.watch("customSections");
-
   // Debounced update function
   const debouncedUpdate = useCallback(
     (values: ResumeData) => {
@@ -42,28 +25,43 @@ export const useFormDebounce = ({
       }
 
       updateTimeoutRef.current = setTimeout(() => {
-        lastDataRef.current = values;
-        onUpdate(values);
+        // Create a fresh reference to guarantee React state update.
+        // structuredClone is available in modern browsers; fallback to
+        // JSON clone for older environments.
+        const clonedValues: ResumeData =
+          typeof structuredClone === "function"
+            ? structuredClone(values)
+            : JSON.parse(JSON.stringify(values));
+
+        lastDataRef.current = clonedValues;
+        onUpdate(clonedValues);
       }, delay);
     },
     [onUpdate, delay]
   );
 
-  // Handle form value changes with debouncing
+  // Subscribe once to the entire form (deep). The callback is fired on
+  // *every* value change – even for deeply-nested fields – without relying on
+  // object reference equality. This avoids the “first change only” issue we
+  // were seeing when editing Work Experience or Custom Sections.
   useEffect(() => {
-    // Skip the initial render to avoid unnecessary updates
-    if (!isInitializedRef.current) {
-      isInitializedRef.current = true;
-      return;
-    }
+    // Skip the initial render; we only care about subsequent user edits.
+    isInitializedRef.current = true;
 
-    const formValues = form.getValues();
+    const subscription = form.watch((_, __) => {
+      if (!isInitializedRef.current) {
+        return; // just an extra guard – should always be initialised
+      }
 
-    // Only update if the data has actually changed
-    if (JSON.stringify(formValues) !== JSON.stringify(lastDataRef.current)) {
-      debouncedUpdate(formValues);
-    }
-  }, [watchedFields, workExperience, customSections, form, debouncedUpdate]);
+      const values = form.getValues();
+
+      if (JSON.stringify(values) !== JSON.stringify(lastDataRef.current)) {
+        debouncedUpdate(values);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form, debouncedUpdate]);
 
   // Cleanup timeout on unmount
   useEffect(() => {

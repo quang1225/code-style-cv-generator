@@ -258,7 +258,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
               ref={contentRef}
             >
               {/* Left Column */}
-              <div className="space-y-6 flex-1 min-w-0">
+              <div className="space-y-6 flex-[6] min-w-0">
                 {/* Summary */}
                 <section>
                   <h2 className="text-orange-400 text-base font-bold mb-3">
@@ -308,7 +308,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
               </div>
 
               {/* Right Column */}
-              <div className="space-y-6 flex-1 min-w-0">
+              <div className="space-y-6 flex-[4] min-w-0">
                 {/* Custom Sections */}
                 {data.customSections?.map((section, index) => (
                   <section key={section.id}>

@@ -64,7 +64,6 @@ export const generatePDF = async (
       width: element.offsetWidth,
       height: element.offsetHeight,
       style: {
-        fontFamily: "Monaco, Menlo, monospace",
         fontSize: "14px",
         lineHeight: "1.5",
         backgroundColor: "#2d3748",

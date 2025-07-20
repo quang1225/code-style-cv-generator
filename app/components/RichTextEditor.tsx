@@ -134,7 +134,6 @@ export default function RichTextEditor({
             placeholder={placeholder}
             className="w-full h-40 p-3 border-0 border-t border-gray-300 rounded-none font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             style={{
-              fontFamily: "Monaco, Menlo, monospace",
               fontSize: "12px",
               lineHeight: "1.4",
             }}
@@ -163,9 +162,6 @@ export default function RichTextEditor({
             placeholder={placeholder}
             modules={modules}
             formats={formats}
-            style={{
-              fontFamily: "Monaco, Menlo, monospace",
-            }}
           />
         </div>
       )}

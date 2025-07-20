@@ -43,7 +43,7 @@
   --color-chart-4: hsl(var(--chart-4));
   --color-chart-5: hsl(var(--chart-5));
 
-  --font-mono: Monaco, Menlo, monospace;
+  --main-font-family: "Roboto Mono", "Roboto Mono Fallback";
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
@@ -90,8 +90,7 @@
   .resume-container {
     background: #2d3748;
     color: #4fd1c7;
-    font-family: "Monaco", "Menlo", "Consolas", "Liberation Mono", "Courier New",
-      monospace;
+    font-family: var(--main-font-family);
   }
 
   .resume-container h1,
@@ -114,7 +113,7 @@
 
   /* Rich text editor styles */
   .rich-text-editor .ql-editor {
-    font-family: "Monaco", "Menlo", monospace !important;
+    font-family: var(--main-font-family) !important;
     line-height: 1.5;
     white-space: pre-wrap;
     min-height: 100px;
@@ -122,7 +121,7 @@
   }
 
   .rich-text-editor .ql-toolbar {
-    font-family: "Monaco", "Menlo", monospace !important;
+    font-family: var(--main-font-family) !important;
     border: 1px solid hsl(var(--border));
     border-bottom: 1px solid hsl(var(--border));
     background: hsl(var(--background));
@@ -295,7 +294,7 @@
   }
 
   .rich-text-editor .ql-editor.ql-blank::before {
-    font-family: "Monaco", "Menlo", monospace !important;
+    font-family: var(--main-font-family) !important;
     font-style: normal;
     color: hsl(var(--muted-foreground));
   }
@@ -333,7 +332,7 @@
 
   /* Resume preview rich text styles */
   .resume-rich-text {
-    font-family: "Monaco", "Menlo", monospace;
+    font-family: var(--main-font-family);
     font-size: inherit;
     line-height: inherit;
     color: inherit;
@@ -453,7 +452,7 @@
 
 @layer base {
   html {
-    font-family: "Monaco", "Menlo", monospace;
+    font-family: var(--main-font-family);
   }
   :root {
     --background: 0 0% 100%;

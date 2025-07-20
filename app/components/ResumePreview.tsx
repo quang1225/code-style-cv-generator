@@ -146,7 +146,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
         style={{
           backgroundColor: "#2d3748",
           color: "#4fd1c7",
-          fontFamily: "Monaco, Menlo, monospace",
           padding: "2rem", // Consolidated padding for consistency
           minHeight: "1122px", // A4 height in pixels (29.7cm at 96 DPI)
           minWidth: "794px", // A4 width in pixels (21cm at 96 DPI)

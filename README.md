@@ -4,7 +4,12 @@ A Next.js application that generates developer-style CVs with a terminal/code-li
 
 ## Demo
 
+#### Live:
 [https://code-style-cv-generator.quang.work/](https://code-style-cv-generator.quang.work/)
+
+#### Video:
+
+[![Demo Video](https://img.youtube.com/vi/JlEtLC_MS3s/0.jpg)](https://www.youtube.com/watch?v=JlEtLC_MS3s)
 
 ## Features
 

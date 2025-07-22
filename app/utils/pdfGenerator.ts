@@ -60,22 +60,8 @@ export const generatePDF = async (
     const options = {
       quality: 1,
       pixelRatio: 2, // Balanced setting for good quality and performance
-      backgroundColor: "#2d3748",
       width: element.offsetWidth,
       height: element.offsetHeight,
-      style: {
-        fontSize: "14px",
-        lineHeight: "1.5",
-        backgroundColor: "#2d3748",
-        color: "#4fd1c7",
-        // Optimized styles for better text rendering
-        webkitFontSmoothing: "antialiased",
-        textRendering: "optimizeLegibility",
-      },
-      filter: (node: HTMLElement) => {
-        // Include all nodes by default
-        return true;
-      },
       cacheBust: true,
     };
 

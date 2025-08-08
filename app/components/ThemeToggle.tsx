@@ -58,7 +58,11 @@ export function ThemeToggle() {
       // Use requestAnimationFrame for maximum performance
       requestAnimationFrame(() => {
         // Calculate radius efficiently - simpler formula
-        const maxRadius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y)) + 50; // Small buffer for clean edges
+        const maxRadius =
+          Math.hypot(
+            Math.max(x, window.innerWidth - x),
+            Math.max(y, window.innerHeight - y)
+          ) + 50; // Small buffer for clean edges
 
         overlay.style.clipPath = `circle(${maxRadius}px at ${x}px ${y}px)`;
 
@@ -94,16 +98,24 @@ export function ThemeToggle() {
         const y = buttonRect.top + buttonRect.height / 2;
 
         // Set CSS custom properties more efficiently
-        document.documentElement.style.setProperty("--theme-toggle-x", `${x}px`);
-        document.documentElement.style.setProperty("--theme-toggle-y", `${y}px`);
+        document.documentElement.style.setProperty(
+          "--theme-toggle-x",
+          `${x}px`
+        );
+        document.documentElement.style.setProperty(
+          "--theme-toggle-y",
+          `${y}px`
+        );
       }
 
       // Check if browser supports View Transitions API
-      if (typeof document !== "undefined" && "startViewTransition" in document) {
+      if (
+        typeof document !== "undefined" &&
+        "startViewTransition" in document
+      ) {
         setIsAnimating(true);
 
         try {
-          // @ts-ignore - View Transitions API is not yet in TypeScript types
           const transition = document.startViewTransition(() => {
             setTheme(newTheme);
           });

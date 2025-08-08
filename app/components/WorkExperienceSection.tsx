@@ -24,10 +24,14 @@ const WorkExperienceSection: React.FC<WorkExperienceSectionProps> = ({
 
   const addWorkExperience = useCallback(() => {
     const currentExperience = form.getValues("workExperience");
-    form.setValue("workExperience", [
-      ...currentExperience,
-      { position: "", company: "", period: "", description: "" },
-    ]);
+    form.setValue(
+      "workExperience",
+      [
+        ...currentExperience,
+        { position: "", company: "", period: "", description: "" },
+      ],
+      { shouldValidate: false, shouldDirty: true }
+    );
   }, [form]);
 
   const removeWorkExperience = useCallback(
@@ -35,7 +39,8 @@ const WorkExperienceSection: React.FC<WorkExperienceSectionProps> = ({
       const currentExperience = form.getValues("workExperience");
       form.setValue(
         "workExperience",
-        currentExperience.filter((_, i) => i !== index)
+        currentExperience.filter((_, i) => i !== index),
+        { shouldValidate: false, shouldDirty: true }
       );
     },
     [form]

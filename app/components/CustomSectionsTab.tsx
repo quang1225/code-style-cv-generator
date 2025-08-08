@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { UseFormReturn } from "react-hook-form";
+import { UseFormReturn, useWatch } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,33 +18,49 @@ interface CustomSectionsTabProps {
 }
 
 const CustomSectionsTab: React.FC<CustomSectionsTabProps> = ({ form }) => {
-  const customSections = form.watch("customSections");
+  const customSections = useWatch({
+    control: form.control,
+    name: "customSections",
+  });
 
   const addCustomSection = useCallback(() => {
     const currentSections = form.getValues("customSections");
-    form.setValue("customSections", [
-      ...currentSections,
-      {
-        id: Date.now().toString(),
-        title: "",
-        items: [
-          {
-            id: Date.now().toString(),
-            title: "",
-            description: "",
-            period: "",
-          },
-        ],
-      },
-    ]);
+    const safeSections = Array.isArray(currentSections) ? currentSections : [];
+    const now = Date.now();
+    form.setValue(
+      "customSections",
+      [
+        ...safeSections,
+        {
+          id: `section-${now}`,
+          title: "",
+          items: [
+            {
+              id: `item-${now}`,
+              title: "",
+              description: "",
+              period: "",
+            },
+          ],
+        },
+      ],
+      { shouldValidate: false, shouldDirty: true }
+    );
   }, [form]);
 
   const removeCustomSection = useCallback(
     (index: number) => {
       const currentSections = form.getValues("customSections");
+      const safeSections = Array.isArray(currentSections)
+        ? currentSections
+        : [];
       form.setValue(
         "customSections",
-        currentSections.filter((_, i) => i !== index)
+        safeSections.filter((_, i) => i !== index),
+        {
+          shouldValidate: false,
+          shouldDirty: true,
+        }
       );
     },
     [form]
@@ -54,14 +70,29 @@ const CustomSectionsTab: React.FC<CustomSectionsTabProps> = ({ form }) => {
     (sectionIndex: number) => {
       const currentSections = form.getValues("customSections");
       const newSections = [...currentSections];
+      const targetSection = newSections[sectionIndex];
+      if (!targetSection) {
+        return;
+      }
+      const existingItems = Array.isArray(targetSection.items)
+        ? targetSection.items
+        : [];
       newSections[sectionIndex] = {
-        ...newSections[sectionIndex],
+        ...targetSection,
         items: [
-          ...newSections[sectionIndex].items,
-          { id: Date.now().toString(), title: "", description: "", period: "" },
+          ...existingItems,
+          {
+            id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            title: "",
+            description: "",
+            period: "",
+          },
         ],
       };
-      form.setValue("customSections", newSections);
+      form.setValue("customSections", newSections, {
+        shouldValidate: false,
+        shouldDirty: true,
+      });
     },
     [form]
   );
@@ -70,13 +101,21 @@ const CustomSectionsTab: React.FC<CustomSectionsTabProps> = ({ form }) => {
     (sectionIndex: number, itemIndex: number) => {
       const currentSections = form.getValues("customSections");
       const newSections = [...currentSections];
+      const targetSection = newSections[sectionIndex];
+      if (!targetSection) {
+        return;
+      }
+      const existingItems = Array.isArray(targetSection.items)
+        ? targetSection.items
+        : [];
       newSections[sectionIndex] = {
-        ...newSections[sectionIndex],
-        items: newSections[sectionIndex].items.filter(
-          (_, i) => i !== itemIndex
-        ),
+        ...targetSection,
+        items: existingItems.filter((_, i) => i !== itemIndex),
       };
-      form.setValue("customSections", newSections);
+      form.setValue("customSections", newSections, {
+        shouldValidate: false,
+        shouldDirty: true,
+      });
     },
     [form]
   );
@@ -143,7 +182,7 @@ const CustomSectionsTab: React.FC<CustomSectionsTabProps> = ({ form }) => {
                 </Button>
               </div>
 
-              {section.items.map((item, itemIndex) => (
+              {(section.items ?? []).map((item, itemIndex) => (
                 <div key={item.id} className="border rounded-lg p-4 space-y-4">
                   <div className="flex justify-between items-start">
                     <h5 className="text-sm font-medium">

@@ -57,12 +57,12 @@ const resumeSchema = z.object({
   customSections: z.array(
     z.object({
       id: z.string(),
-      title: z.string().min(1, "Section title is required"),
+      title: z.string(),
       items: z.array(
         z.object({
           id: z.string(),
-          title: z.string().min(1, "Item title is required"),
-          description: z.string().min(1, "Item description is required"),
+          title: z.string(),
+          description: z.string(),
           period: z.string(),
         })
       ),

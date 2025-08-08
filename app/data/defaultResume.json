@@ -79,6 +79,24 @@
       ]
     },
     {
+      "id": "section-1754641430990",
+      "title": "Certifications",
+      "items": [
+        {
+          "id": "item-1754641430990",
+          "title": "Encouragement Award",
+          "description": "<p>Creative Software Contest of Ho Chi Minh City, Viet Nam</p>",
+          "period": "06/2016"
+        },
+        {
+          "id": "item-1754641518125-e0sot8jxd",
+          "title": "Encouragement Award",
+          "description": "<p>Creative App and Game Contest of University of Technology, Viet Nam</p>",
+          "period": "12/2016"
+        }
+      ]
+    },
+    {
       "id": "3",
       "title": "Additional Skills",
       "items": [

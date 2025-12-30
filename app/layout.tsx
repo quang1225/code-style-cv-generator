@@ -28,10 +28,16 @@ export const metadata: Metadata = {
     "developer portfolio",
     "resume creator",
     "cv maker",
+    "markdown resume",
+    "json resume",
+    "tech resume",
+    "software engineer resume",
+    "programmer cv",
   ],
   authors: [{ name: "Code Style CV Generator" }],
   creator: "Code Style CV Generator",
   publisher: "Code Style CV Generator",
+  category: "productivity",
   formatDetection: {
     email: false,
     address: false,
@@ -64,7 +70,11 @@ export const metadata: Metadata = {
     description:
       "Generate professional developer-style CVs with terminal aesthetics. Create, preview, and export your resume as PDF.",
     images: ["/og-image.png"],
+    creator: "@codestylecv",
   },
+  // verification: {
+  //   google: "google-site-verification-code",
+  // },
   robots: {
     index: true,
     follow: true,
@@ -118,7 +128,10 @@ export default function RootLayout({
       "Terminal-style design",
       "Professional templates",
       "Dark/Light mode support",
+      "Responsive design",
+      "No registration required",
     ],
+    screenshot: "https://code-style-cv-generator.quang.work/og-image.png",
   };
 
   return (

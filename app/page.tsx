@@ -16,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FileDown, CheckCircle, AlertCircle } from "lucide-react";
 import defaultResumeData from "./data/defaultResume.json";
-import Head from "next/head";
 
 export default function Home() {
   const [resumeData, setResumeData] = useState<ResumeData>(
@@ -66,41 +65,8 @@ export default function Home() {
     setResumeData(newData);
   }, []);
 
-  // Additional JSON-LD for the homepage
-  const homepageJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "Code Style CV Generator",
-    description:
-      "Generate professional developer-style CVs with terminal aesthetics. Create, preview, and export your resume as PDF with real-time editing.",
-    url: "https://code-style-cv-generator.quang.work",
-    applicationCategory: "BusinessApplication",
-    operatingSystem: "Web Browser",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
-    },
-    featureList: [
-      "Real-time resume editing",
-      "PDF export functionality",
-      "Terminal-style design",
-      "Professional templates",
-      "Dark/Light mode support",
-      "Responsive design",
-      "No registration required",
-    ],
-    screenshot: "https://code-style-cv-generator.quang.work/og-image.png",
-  };
-
   return (
     <>
-      <Head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageJsonLd) }}
-        />
-      </Head>
       <div className="min-h-screen bg-background">
         <div className="container mx-auto py-8 px-4">
           <div className="mb-8 text-center">

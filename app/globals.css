@@ -324,6 +324,7 @@
   .rich-text-editor .ql-editor a {
     color: #3b82f6;
     text-decoration: underline;
+    text-decoration-thickness: 1px;
   }
 
   .rich-text-editor .ql-editor a:hover {
@@ -386,10 +387,17 @@
   .resume-rich-text a {
     color: #3b82f6;
     text-decoration: underline;
+    text-decoration-thickness: 1px;
   }
 
   .resume-rich-text a:hover {
     color: #1d4ed8;
+  }
+
+  /* Copyright link - same color as text */
+  #resume-content .copyright-link {
+    color: inherit;
+    text-decoration-thickness: 1px;
   }
 
   /* Specific class for preventing period breaks - only for period text */
@@ -415,6 +423,10 @@
   #resume-content {
     text-wrap: pretty;
     hyphens: auto;
+  }
+
+  #resume-content a {
+    text-decoration-thickness: 1px;
   }
 
   /* Dark mode support for react-image-crop */

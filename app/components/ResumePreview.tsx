@@ -8,13 +8,11 @@ interface ResumePreviewProps {
 }
 
 /*
-⚠️  IMPORTANT: PDF CONSISTENCY MAINTENANCE
+⚠️  IMPORTANT: PDF LAYOUT CONSISTENCY
 
-When adding new Tailwind classes to this component, ensure they are 
-mapped in utils/pdfGenerator.ts with their exact hex/rem values.
-
-The PDF generator uses a custom CSS override system that requires 
-manual synchronization with the classes used here.
+The PDF is generated via /api/generate-pdf using utils/resumeToHtml.ts.
+When changing layout or styles here, update resumeToHtml.ts to match
+so the exported PDF stays consistent with the preview.
 */
 
 const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
@@ -125,7 +123,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
             href={text}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-400 hover:text-blue-300 underline"
+            className="text-blue-400 hover:text-blue-300 underline decoration-1"
           >
             {text}
           </a>
@@ -164,7 +162,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
               href="https://code-style-cv-generator.quang.work"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-600 hover:text-gray-500 underline"
+              className="copyright-link text-inherit hover:text-gray-500 underline decoration-1"
             >
               https://code-style-cv-generator.quang.work
             </a>
@@ -275,7 +273,14 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                   </h2>
                   <div className="flex flex-col gap-5">
                     {data.workExperience?.map((job, index) => (
-                      <div key={index}>
+                      <div
+                        key={index}
+                        className={
+                          index < (data.workExperience?.length ?? 1) - 1
+                            ? "pb-5 border-b border-gray-600"
+                            : ""
+                        }
+                      >
                         <div className="mb-1">
                           <div className="flex justify-between items-start mb-0.5 gap-2">
                             <h3 className="text-white font-semibold text-xs flex-1">
@@ -316,7 +321,14 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                     </h2>
                     <div className="space-y-3">
                       {section.items?.map((item, itemIndex) => (
-                        <div key={item.id} className="mb-3">
+                        <div
+                          key={item.id}
+                          className={
+                            itemIndex < (section.items?.length ?? 1) - 1
+                              ? "mb-3 pb-3 border-b border-gray-600"
+                              : "mb-3"
+                          }
+                        >
                           <div className="mb-1">
                             <div className="flex justify-between items-start mb-0.5 gap-2">
                               {item.title && (

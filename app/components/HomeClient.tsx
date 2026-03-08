@@ -34,7 +34,7 @@ function PdfButton({
       onGeneratingChange(true);
       onStatusChange({ type: null, message: "" });
       const { generatePDF } = await import("../utils/pdfGenerator");
-      const result = await generatePDF(resumeData.name);
+      const result = await generatePDF(resumeData);
       onStatusChange({
         type: result.success ? "success" : "error",
         message: result.message,
@@ -49,7 +49,7 @@ function PdfButton({
     } finally {
       onGeneratingChange(false);
     }
-  }, [resumeData.name, onStatusChange, onGeneratingChange]);
+  }, [resumeData, onStatusChange, onGeneratingChange]);
 
   return (
     <Button

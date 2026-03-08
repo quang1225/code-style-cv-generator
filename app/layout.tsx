@@ -9,6 +9,8 @@ import { Analytics } from "@vercel/analytics/next";
 const robotoMono = Roboto_Mono({
   subsets: ["latin"],
   weight: ["400", "500", "700"],
+  display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {

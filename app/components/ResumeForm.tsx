@@ -18,9 +18,14 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
+import dynamic from "next/dynamic";
 import ConfirmationDialog from "./ConfirmationDialog";
-import ImageCropper from "./ImageCropper";
 import PersonalInfoTab from "./PersonalInfoTab";
+
+const ImageCropper = dynamic(() => import("./ImageCropper"), {
+  ssr: false,
+  loading: () => null,
+});
 import WorkExperienceSection from "./WorkExperienceSection";
 import CustomSectionsTab from "./CustomSectionsTab";
 import { useBackupRestore } from "../hooks/useBackupRestore";

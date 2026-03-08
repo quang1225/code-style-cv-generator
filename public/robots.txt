@@ -2,8 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-# Sitemap
 Sitemap: https://code-style-cv-generator.quang.work/sitemap.xml
-
-# Crawl-delay
-Crawl-delay: 1 

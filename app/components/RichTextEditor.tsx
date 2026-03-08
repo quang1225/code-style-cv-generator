@@ -26,7 +26,8 @@ export default function RichTextEditor({
   const [isHtmlView, setIsHtmlView] = useState(false);
 
   // Helper function to strip outer paragraph tags for HTML view
-  const stripOuterParagraph = (html: string): string => {
+  const stripOuterParagraph = (html: string | undefined): string => {
+    if (html == null) return "";
     const trimmed = html.trim();
     if (trimmed.startsWith("<p>") && trimmed.endsWith("</p>")) {
       return trimmed.slice(3, -4);
@@ -35,7 +36,8 @@ export default function RichTextEditor({
   };
 
   // Helper function to ensure content is wrapped in paragraph tags for rich text
-  const ensureParagraphWrapper = (html: string): string => {
+  const ensureParagraphWrapper = (html: string | undefined): string => {
+    if (html == null) return "<p><br></p>";
     const trimmed = html.trim();
     if (!trimmed) return "<p><br></p>";
     if (trimmed.startsWith("<p>") && trimmed.endsWith("</p>")) {
@@ -51,6 +53,20 @@ export default function RichTextEditor({
   const handleHtmlChange = (newHtml: string) => {
     const wrappedHtml = ensureParagraphWrapper(newHtml);
     onChange(wrappedHtml);
+  };
+
+  // Ignore ReactQuill's initial onChange on mount - it fires with normalized HTML
+  // (spaces → &nbsp;) which corrupts content when switching to Sections tab.
+  const skipNextChange = React.useRef(true);
+  React.useEffect(() => {
+    const id = setTimeout(() => {
+      skipNextChange.current = false;
+    }, 100); // Allow Quill (dynamically loaded) to finish init before accepting changes
+    return () => clearTimeout(id);
+  }, []);
+  const handleQuillChange = (newValue: string) => {
+    if (skipNextChange.current) return;
+    onChange(newValue);
   };
 
   // Configure the toolbar with essential formatting options including indent and link
@@ -158,7 +174,7 @@ export default function RichTextEditor({
           <ReactQuill
             theme="snow"
             value={value}
-            onChange={onChange}
+            onChange={handleQuillChange}
             placeholder={placeholder}
             modules={modules}
             formats={formats}

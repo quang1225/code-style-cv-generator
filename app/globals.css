@@ -349,17 +349,23 @@
 
   .resume-rich-text br {
     display: block;
-    content: "";
-    margin: 0.125rem 0;
+    margin: 0.25em 0;
   }
 
   .resume-rich-text p {
     margin: 0;
     padding: 0;
+    display: block;
   }
 
   .resume-rich-text p:not(:first-child) {
-    margin-top: 0.25rem;
+    margin-top: 0.5em;
+  }
+
+  /* Ensure empty paragraphs and <p><br></p> create visible line breaks */
+  .resume-rich-text p:empty,
+  .resume-rich-text p:has(br:only-child) {
+    min-height: 1em;
   }
 
   /* Resume preview indent support */

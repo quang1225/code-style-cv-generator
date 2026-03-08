@@ -88,15 +88,10 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
 
     // If text contains HTML tags, render as HTML
     if (text.includes("<")) {
-      // Replace &nbsp; and &#160; with regular spaces so leading-relaxed can wrap properly.
-      // Quill/RichTextEditor outputs non-breaking spaces which prevent line breaks.
-      const normalizedHtml = text
-        .replace(/&nbsp;/g, " ")
-        .replace(/&#160;/g, " ");
       return (
         <div
           className="resume-rich-text"
-          dangerouslySetInnerHTML={{ __html: normalizedHtml }}
+          dangerouslySetInnerHTML={{ __html: text }}
         />
       );
     }

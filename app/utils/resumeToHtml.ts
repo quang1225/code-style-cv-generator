@@ -17,9 +17,13 @@ const RESUME_CSS = `
   .resume-rich-text { font-size: 11px; line-height: 1.625; color: #d1d5db; }
   .resume-rich-text strong { font-weight: bold; }
   .resume-rich-text em { font-style: italic; }
-  .resume-rich-text p { margin: 0; padding: 0; }
-  .resume-rich-text p:not(:first-child) { margin-top: 0.25rem; }
-  .resume-rich-text br { display: block; margin: 0.125rem 0; }
+  .resume-rich-text p { margin: 0; padding: 0; display: block; }
+  .resume-rich-text p:not(:first-child) { margin-top: 0.5em; }
+  .resume-rich-text p:empty,
+  .resume-rich-text p:has(br:only-child) { min-height: 1em; }
+  .resume-rich-text br { display: block; margin: 0.25em 0; }
+  .resume-rich-text .line-break-spacer { display: block; height: 0.5em; }
+  .resume-rich-text .resume-spacer { min-height: 1em; }
   .resume-rich-text a { color: #3b82f6; text-decoration: underline; text-decoration-thickness: 1px; }
   .copyright-link { color: inherit !important; text-decoration: underline; text-decoration-thickness: 1px; }
   .resume-rich-text .ql-indent-1 { padding-left: 2em; }
@@ -69,8 +73,17 @@ function escapeHtml(text: string): string {
     .replace(/"/g, "&quot;");
 }
 
+const LINE_BREAK_SPACER =
+  '<span class="line-break-spacer" style="display:block;height:0.5em;"></span>';
+
 function normalizeHtml(html: string): string {
-  return html.replace(/&nbsp;/g, " ").replace(/&#160;/g, " ");
+  return html
+    .replace(/&nbsp;/g, " ")
+    .replace(/&#160;/g, " ")
+    .replace(/\n/g, "<br>")
+    .replace(/<p>\s*<br>\s*<\/p>/gi, '<p class="resume-spacer">&nbsp;</p>')
+    .replace(/<p>\s*<\/p>/g, '<p class="resume-spacer">&nbsp;</p>')
+    .replace(/<br>\s*<br>/gi, `<br>${LINE_BREAK_SPACER}<br>`);
 }
 
 function formatContent(text: string): string {
@@ -78,7 +91,9 @@ function formatContent(text: string): string {
   if (text.includes("<")) {
     return normalizeHtml(text);
   }
-  return escapeHtml(text).replace(/\n/g, "<br>");
+  return escapeHtml(text)
+    .replace(/\n/g, "<br>")
+    .replace(/<br>\s*<br>/gi, `<br>${LINE_BREAK_SPACER}<br>`);
 }
 
 export function resumeToHtml(data: ResumeData): string {

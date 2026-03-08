@@ -349,7 +349,7 @@
   .resume-rich-text br {
     display: block;
     content: "";
-    margin: 0.25rem 0;
+    margin: 0.125rem 0;
   }
 
   .resume-rich-text p {
@@ -358,7 +358,7 @@
   }
 
   .resume-rich-text p:not(:first-child) {
-    margin-top: 0.5rem;
+    margin-top: 0.25rem;
   }
 
   /* Resume preview indent support */

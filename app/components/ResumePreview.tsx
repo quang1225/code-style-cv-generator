@@ -35,12 +35,12 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
           if (contentRef.current && lineNumbersRef.current) {
             // Get the actual rendered height of the content
             const contentHeight = contentRef.current.offsetHeight;
-            const lineHeight = 20; // Fixed line height in pixels
+            const lineHeight = 18; // Fixed line height in pixels (smaller for page breaks)
 
             // Calculate exact number of lines needed, ensuring minimum
             const neededLines = Math.max(
               Math.ceil(contentHeight / lineHeight),
-              20
+              20,
             );
 
             // Only update if there's a meaningful change
@@ -95,10 +95,15 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
 
     // If text contains HTML tags, render as HTML
     if (text.includes("<")) {
+      // Replace &nbsp; and &#160; with regular spaces so leading-relaxed can wrap properly.
+      // Quill/RichTextEditor outputs non-breaking spaces which prevent line breaks.
+      const normalizedHtml = text
+        .replace(/&nbsp;/g, " ")
+        .replace(/&#160;/g, " ");
       return (
         <div
           className="resume-rich-text"
-          dangerouslySetInnerHTML={{ __html: text }}
+          dangerouslySetInnerHTML={{ __html: normalizedHtml }}
         />
       );
     }
@@ -135,18 +140,18 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
       // Otherwise, treat as regular text
       return formatText(text);
     },
-    [formatText]
+    [formatText],
   );
 
   return (
     <div className="w-fit">
       <div
         id="resume-content"
-        className="text-sm font-mono shadow-2xl relative"
+        className="text-xs font-mono shadow-2xl relative"
         style={{
           backgroundColor: "#2d3748",
           color: "#4fd1c7",
-          padding: "2rem", // Consolidated padding for consistency
+          padding: "1.5rem", // Tighter padding to save page breaks
           minHeight: "1122px", // A4 height in pixels (29.7cm at 96 DPI)
           minWidth: "794px", // A4 width in pixels (21cm at 96 DPI)
           width: "794px", // Fixed width to prevent flex issues
@@ -158,7 +163,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
       >
         {/* Copyright text at top right border */}
         {data.showCopyright && (
-          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 text-[11px] text-gray-600 font-normal whitespace-nowrap z-10">
+          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 text-[10px] text-gray-600 font-normal whitespace-nowrap z-10">
             CV made with{" "}
             <a
               href="https://code-style-cv-generator.quang.work"
@@ -173,29 +178,29 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
 
         <div>
           {/* Terminal Header */}
-          <div className="mb-8">
-            <div className="flex items-center flex-wrap gap-6 mb-4">
+          <div className="mb-5">
+            <div className="flex items-center flex-wrap gap-4 mb-3">
               <div className="shrink-0">
                 {data.avatar ? (
                   <img
                     src={data.avatar}
                     alt="Profile"
-                    className="w-24 h-24 rounded-full border-2 border-green-400"
+                    className="w-20 h-20 rounded-full border-2 border-green-400"
                   />
                 ) : (
-                  <div className="w-24 h-24 rounded-full bg-gray-600 border-2 border-green-400 flex items-center justify-center"></div>
+                  <div className="w-20 h-20 rounded-full bg-gray-600 border-2 border-green-400 flex items-center justify-center"></div>
                 )}
               </div>
               <div className="flex-1">
-                <div className="text-3xl font-bold mb-2">
+                <div className="text-2xl font-bold mb-1">
                   <span className="text-green-400">&lt;</span>
                   <span className="text-white">CV</span>
                   <span className="text-green-400">&gt;</span>
                 </div>
-                <div className="text-2xl text-white font-bold">{data.name}</div>
-                <div className="text-sm text-gray-400">{data.title}</div>
+                <div className="text-xl text-white font-bold">{data.name}</div>
+                <div className="text-xs text-gray-400">{data.title}</div>
               </div>
-              <div className="basic-info text-left text-xs text-gray-300 space-y-1">
+              <div className="basic-info text-left text-[11px] text-gray-300 space-y-0.5">
                 {data.yearOfBirth && (
                   <div>
                     <span>🎂 Year of Birth: {data.yearOfBirth}</span>
@@ -231,10 +236,10 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
             {/* Line Numbers */}
             <div
               ref={lineNumbersRef}
-              className="text-gray-600 text-xs leading-relaxed overflow-hidden"
+              className="text-gray-600 text-[10px] leading-relaxed overflow-hidden"
               style={{
                 paddingTop: "1px",
-                width: "24px",
+                width: "20px",
                 flexShrink: 0,
                 display: "flex",
                 flexDirection: "column",
@@ -244,7 +249,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                 <div
                   key={i}
                   className="text-right flex-none"
-                  style={{ lineHeight: "1.25", height: "20px" }}
+                  style={{ lineHeight: "1.25", height: "18px" }}
                 >
                   {i + 1}
                 </div>
@@ -253,42 +258,42 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
 
             {/* Content */}
             <div
-              className="resume-main-content flex gap-6 flex-1 min-w-0 h-fit"
+              className="resume-main-content flex gap-4 flex-1 min-w-0 h-fit"
               ref={contentRef}
             >
               {/* Left Column */}
-              <div className="space-y-6 flex-[6] min-w-0">
+              <div className="space-y-4 flex-[6] min-w-0">
                 {/* Summary */}
                 <section>
-                  <h2 className="text-orange-400 text-base font-bold mb-3">
+                  <h2 className="text-orange-400 text-sm font-bold mb-2">
                     /summary
                   </h2>
-                  <div className="text-gray-300 leading-relaxed text-xs">
+                  <div className="text-gray-300 leading-relaxed text-[11px]">
                     {formatLinkText(data.summary)}
                   </div>
                 </section>
 
                 {/* Work Experience */}
                 <section>
-                  <h2 className="text-orange-400 text-base font-bold mb-3">
+                  <h2 className="text-orange-400 text-sm font-bold mb-2">
                     /work experience
                   </h2>
-                  <div className="flex flex-col gap-8">
+                  <div className="flex flex-col gap-5">
                     {data.workExperience?.map((job, index) => (
                       <div key={index}>
-                        <div className="mb-2">
-                          <div className="flex justify-between items-start mb-1 gap-2">
-                            <h3 className="text-white font-semibold text-sm flex-1">
+                        <div className="mb-1">
+                          <div className="flex justify-between items-start mb-0.5 gap-2">
+                            <h3 className="text-white font-semibold text-xs flex-1">
                               {job.position}
                             </h3>
                             <span
-                              className="font-bold text-sm prevent-period-break whitespace-nowrap"
+                              className="font-bold text-xs prevent-period-break whitespace-nowrap"
                               style={{ color: "#8b5cf6" }}
                             >
                               {job.period}
                             </span>
                           </div>
-                          <p className="text-gray-400 text-sm">
+                          <p className="text-gray-400 text-xs">
                             <span
                               style={{ color: "#ef4444" }}
                               className="font-semibold"
@@ -297,7 +302,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                             </span>
                           </p>
                         </div>
-                        <div className="text-gray-300 text-xs leading-relaxed">
+                        <div className="text-gray-300 text-[11px] leading-relaxed">
                           {formatLinkText(job.description)}
                         </div>
                       </div>
@@ -307,26 +312,26 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
               </div>
 
               {/* Right Column */}
-              <div className="space-y-6 flex-[4] min-w-0">
+              <div className="space-y-4 flex-[4] min-w-0">
                 {/* Custom Sections */}
                 {data.customSections?.map((section, index) => (
                   <section key={section.id}>
-                    <h2 className="text-orange-400 text-base font-bold mb-3">
+                    <h2 className="text-orange-400 text-sm font-bold mb-2">
                       /{section.title.toLowerCase()}
                     </h2>
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       {section.items?.map((item, itemIndex) => (
-                        <div key={item.id} className="mb-4">
-                          <div className="mb-2">
-                            <div className="flex justify-between items-start mb-1 gap-2">
+                        <div key={item.id} className="mb-3">
+                          <div className="mb-1">
+                            <div className="flex justify-between items-start mb-0.5 gap-2">
                               {item.title && (
-                                <h3 className="text-white font-semibold text-sm flex-1 min-w-0">
+                                <h3 className="text-white font-semibold text-xs flex-1 min-w-0">
                                   {item.title}
                                 </h3>
                               )}
                               {item.period && (
                                 <span
-                                  className="font-bold text-sm prevent-period-break whitespace-nowrap shrink-0"
+                                  className="font-bold text-xs prevent-period-break whitespace-nowrap shrink-0"
                                   style={{ color: "#8b5cf6" }}
                                 >
                                   {item.period}
@@ -335,7 +340,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                             </div>
                           </div>
                           {item.description && (
-                            <div className="text-gray-300 text-xs leading-relaxed">
+                            <div className="text-gray-300 text-[11px] leading-relaxed">
                               {formatLinkText(item.description)}
                             </div>
                           )}

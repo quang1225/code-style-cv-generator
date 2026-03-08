@@ -4,6 +4,7 @@ import { ThemeProvider } from "./components/ThemeProvider";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { Roboto_Mono } from "next/font/google";
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 
 const robotoMono = Roboto_Mono({
   subsets: ["latin"],
@@ -152,6 +153,8 @@ export default function RootLayout({
           <ThemeToggle />
           {children}
         </ThemeProvider>
+
+        <Analytics />
       </body>
     </html>
   );

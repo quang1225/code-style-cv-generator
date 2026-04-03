@@ -189,11 +189,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                 <div className="text-xs text-gray-400">{data.title}</div>
               </div>
               <div className="basic-info text-left text-[11px] text-gray-300 space-y-0.5">
-                {data.yearOfBirth && (
-                  <div>
-                    <span>🎂 Year of Birth: {data.yearOfBirth}</span>
-                  </div>
-                )}
                 {data.gender && (
                   <div>
                     <span>👤 Gender: {data.gender}</span>

@@ -122,21 +122,6 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
         )}
       />
 
-      {/* Year of Birth */}
-      <FormField
-        control={form.control}
-        name="yearOfBirth"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Year of Birth</FormLabel>
-            <FormControl>
-              <Input placeholder="e.g., 1995" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
       {/* Gender */}
       <FormField
         control={form.control}

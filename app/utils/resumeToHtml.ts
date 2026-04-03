@@ -146,7 +146,6 @@ export function resumeToHtml(data: ResumeData): string {
     .join("");
 
   const basicInfoHtml = [
-    data.yearOfBirth && `🎂 Year of Birth: ${escapeHtml(data.yearOfBirth)}`,
     data.gender && `👤 Gender: ${escapeHtml(data.gender)}`,
     data.phone && `📱 Phone: ${escapeHtml(data.phone)}`,
     data.email && `📧 Email: ${escapeHtml(data.email)}`,

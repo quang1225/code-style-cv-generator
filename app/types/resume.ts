@@ -2,7 +2,6 @@ export interface ResumeData {
   name: string;
   title: string;
   location: string;
-  yearOfBirth: string;
   gender: string;
   phone: string;
   email: string;

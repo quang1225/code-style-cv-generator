@@ -44,7 +44,6 @@ const resumeSchema = z.object({
   name: z.string().min(1, "Name is required"),
   title: z.string().min(1, "Title is required"),
   location: z.string().min(1, "Location is required"),
-  yearOfBirth: z.string().min(1, "Year of birth is required"),
   gender: z.string().min(1, "Gender is required"),
   phone: z.string().min(1, "Phone is required"),
   email: z.string().email("Invalid email address"),

@@ -14,5 +14,4 @@ const EMOJI_TAIL =
 export const RESUME_FONT_FAMILY_PDF = `'Roboto Mono', ${EMOJI_TAIL}`;
 
 /** Next.js preview: optimized Roboto Mono variable + same emoji fallbacks as PDF. */
-export const RESUME_FONT_FAMILY_PREVIEW =
-  `var(${RESUME_FONT_MONO_CSS_VAR}), ${EMOJI_TAIL}`;
+export const RESUME_FONT_FAMILY_PREVIEW = `var(${RESUME_FONT_MONO_CSS_VAR}), ${EMOJI_TAIL}`;

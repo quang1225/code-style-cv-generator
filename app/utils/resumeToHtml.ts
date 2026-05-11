@@ -83,9 +83,7 @@ const LINE_BREAK_SPACER =
 
 function normalizeHtml(html: string): string {
   return preserveHyphenBreaksInHtml(
-    html
-      .replace(/&nbsp;/g, " ")
-      .replace(/&#160;/g, " ")
+    html.replace(/&nbsp;/g, " ").replace(/&#160;/g, " "),
   )
     .replace(/\n/g, "<br>")
     .replace(/<p>\s*<br>\s*<\/p>/gi, '<p class="resume-spacer">&nbsp;</p>')
@@ -121,7 +119,7 @@ export function resumeToHtml(data: ResumeData): string {
           ${formatContent(job.description)}
         </div>
       </div>
-    `
+    `,
     )
     .join("");
 
@@ -143,12 +141,12 @@ export function resumeToHtml(data: ResumeData): string {
               </div>
               ${item.description ? `<div class="resume-rich-text text-gray-300" style="font-size: 11px; line-height: 1.625;">${formatContent(item.description)}</div>` : ""}
             </div>
-          `
+          `,
             )
             .join("")}
         </div>
       </section>
-    `
+    `,
     )
     .join("");
 
@@ -174,11 +172,15 @@ export function resumeToHtml(data: ResumeData): string {
 <body>
   <div class="pdf-bg" aria-hidden="true"></div>
   <div id="resume-content">
-    ${data.showCopyright ? `
+    ${
+      data.showCopyright
+        ? `
     <div style="position: absolute; top: 0.5rem; left: 50%; transform: translateX(-50%); font-size: 10px; color: #4b5563; z-index: 10;">
       CV made with <a href="https://code-style-cv-generator.quang.work" class="copyright-link" target="_blank" rel="noopener">https://code-style-cv-generator.quang.work</a>
     </div>
-    ` : ""}
+    `
+        : ""
+    }
     <div>
       <div class="mb-5">
         <div class="flex gap-4 mb-3" style="flex-wrap: wrap; align-items: center;">

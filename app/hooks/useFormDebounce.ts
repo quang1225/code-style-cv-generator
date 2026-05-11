@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from "react";
-import { UseFormReturn } from "react-hook-form";
+import { useWatch, type UseFormReturn } from "react-hook-form";
 import { ResumeData } from "../types/resume";
 
 interface UseFormDebounceProps {
@@ -16,6 +16,7 @@ export const useFormDebounce = ({
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isInitializedRef = useRef(false);
   const lastDataRef = useRef<ResumeData | null>(null);
+  const watchedValues = useWatch({ control: form.control });
 
   // Debounced update function
   const debouncedUpdate = useCallback(
@@ -40,28 +41,29 @@ export const useFormDebounce = ({
     [onUpdate, delay]
   );
 
-  // Subscribe once to the entire form (deep). The callback is fired on
-  // *every* value change – even for deeply-nested fields – without relying on
-  // object reference equality. This avoids the “first change only” issue we
-  // were seeing when editing Work Experience or Custom Sections.
+  // useWatch tracks nested setValue/reset changes reliably and reruns this hook
+  // whenever form values change, including custom section and work arrays.
   useEffect(() => {
-    // Skip the initial render; we only care about subsequent user edits.
-    isInitializedRef.current = true;
+    if (!watchedValues || typeof watchedValues !== "object") {
+      return;
+    }
 
-    const subscription = form.watch((_, __) => {
-      if (!isInitializedRef.current) {
-        return; // just an extra guard – should always be initialised
-      }
+    const currentValues = watchedValues as ResumeData;
 
-      const values = form.getValues();
+    if (!isInitializedRef.current) {
+      const clone: ResumeData =
+        typeof structuredClone === "function"
+          ? structuredClone(currentValues)
+          : JSON.parse(JSON.stringify(currentValues));
+      lastDataRef.current = clone;
+      isInitializedRef.current = true;
+      return;
+    }
 
-      if (JSON.stringify(values) !== JSON.stringify(lastDataRef.current)) {
-        debouncedUpdate(values);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [form, debouncedUpdate]);
+    if (JSON.stringify(currentValues) !== JSON.stringify(lastDataRef.current)) {
+      debouncedUpdate(currentValues);
+    }
+  }, [watchedValues, debouncedUpdate]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -77,8 +79,12 @@ export const useFormDebounce = ({
     (data: ResumeData) => {
       // Only reset if the data is actually different from what we last sent
       if (JSON.stringify(data) !== JSON.stringify(lastDataRef.current)) {
-        lastDataRef.current = data;
-        form.reset(data);
+        const clone: ResumeData =
+          typeof structuredClone === "function"
+            ? structuredClone(data)
+            : JSON.parse(JSON.stringify(data));
+        lastDataRef.current = clone;
+        form.reset(clone);
       }
     },
     [form]

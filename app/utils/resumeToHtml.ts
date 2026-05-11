@@ -6,7 +6,19 @@ import {
 import { RESUME_FONT_FAMILY_PDF } from "./resumeFontFamily";
 
 const RESUME_CSS = `
-  * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  * {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    /* Highest-fidelity glyph rendering for the PDF: enable kerning, common
+       ligatures, contextual alternates and grayscale smoothing. */
+    font-kerning: normal;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    text-rendering: geometricPrecision;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  img { image-rendering: auto; }
   html, body { margin: 0; padding: 0; font-family: ${RESUME_FONT_FAMILY_PDF}; background-color: #2d3748 !important; min-height: 100vh; }
   @page { size: A4; margin: 0; }
   .pdf-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: #2d3748; z-index: -1; }
@@ -166,7 +178,9 @@ export function resumeToHtml(data: ResumeData): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=794">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&amp;family=Noto+Color+Emoji&amp;display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&amp;family=Noto+Color+Emoji&amp;display=swap" rel="stylesheet">
   <style>${RESUME_CSS}</style>
 </head>
 <body>

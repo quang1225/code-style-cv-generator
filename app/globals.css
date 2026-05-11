@@ -70,14 +70,18 @@
 
 /* Custom smooth transitions */
 @utility smooth-expand {
-  transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
-    transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease-out;
+  transition:
+    width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    box-shadow 0.4s ease-out;
   will-change: width, transform;
 
   &:hover {
     transform: translateZ(0);
-    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s ease-out;
+    transition:
+      width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.5s ease-out;
   }
 }
 
@@ -598,19 +602,27 @@
   input,
   textarea,
   select {
-    transition: background-color 0.1s ease-out, border-color 0.1s ease-out,
-      color 0.1s ease-out, transform 0.1s ease-out, opacity 0.1s ease-out !important;
+    transition:
+      background-color 0.1s ease-out,
+      border-color 0.1s ease-out,
+      color 0.1s ease-out,
+      transform 0.1s ease-out,
+      opacity 0.1s ease-out !important;
   }
 
   /* Exception: Allow smooth-expand animations to work */
   .smooth-expand {
-    transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
-      transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease-out !important;
+    transition:
+      width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+      transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+      box-shadow 0.4s ease-out !important;
   }
 
   .smooth-expand:hover {
-    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s ease-out !important;
+    transition:
+      width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.5s ease-out !important;
   }
 
   /* Exception: Allow important UI animations */
@@ -618,8 +630,11 @@
   [class*="hover:scale"],
   [class*="hover:bg-"],
   [class*="hover:text-"] {
-    transition: box-shadow 0.2s ease-out, transform 0.2s ease-out,
-      background-color 0.1s ease-out, color 0.1s ease-out !important;
+    transition:
+      box-shadow 0.2s ease-out,
+      transform 0.2s ease-out,
+      background-color 0.1s ease-out,
+      color 0.1s ease-out !important;
   }
 
   /* Exception: Allow width transitions for layout elements */

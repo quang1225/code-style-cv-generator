@@ -19,6 +19,17 @@ function formatNameForFilename(fullName: string): string {
   return fileName || "Resume";
 }
 
+/**
+ * A4 at 96 CSS pixels/inch. `deviceScaleFactor: 2` upscales raster content
+ * (color emoji glyph atlases, the avatar bitmap) so they stay crisp in the
+ * PDF; vector text is unaffected by this and stays vector.
+ */
+const PDF_VIEWPORT = {
+  width: 794,
+  height: 1122,
+  deviceScaleFactor: 2,
+} as const;
+
 async function launchBrowser() {
   const isVercel = !!process.env.VERCEL;
   const isLinux = process.platform === "linux";
@@ -28,7 +39,7 @@ async function launchBrowser() {
     const puppeteer = await import("puppeteer-core");
     return puppeteer.default.launch({
       args: chromium.default.args,
-      defaultViewport: { width: 794, height: 1122 },
+      defaultViewport: PDF_VIEWPORT,
       executablePath: await chromium.default.executablePath(),
       headless: true,
     });
@@ -37,7 +48,8 @@ async function launchBrowser() {
   const puppeteer = await import("puppeteer");
   return puppeteer.default.launch({
     headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    defaultViewport: PDF_VIEWPORT,
+    args: ["--no-sandbox", "--disable-setuid-sandbox", "--font-render-hinting=none"],
   });
 }
 
@@ -49,17 +61,32 @@ export async function POST(request: NextRequest) {
     const browser = await launchBrowser();
 
     const page = await browser.newPage();
+    await page.setViewport(PDF_VIEWPORT);
     await page.setContent(html, {
       waitUntil: "load",
       timeout: 30000,
     });
 
-    await page.evaluate(() => document.fonts.ready);
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+      await Promise.all(
+        Array.from(document.images, (img) =>
+          img.complete
+            ? Promise.resolve()
+            : new Promise<void>((resolve) => {
+                img.addEventListener("load", () => resolve(), { once: true });
+                img.addEventListener("error", () => resolve(), { once: true });
+              }),
+        ),
+      );
+    });
 
     const pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true,
       margin: { top: 0, right: 0, bottom: 0, left: 0 },
+      preferCSSPageSize: true,
+      tagged: true,
     });
 
     await browser.close();
@@ -83,7 +110,7 @@ export async function POST(request: NextRequest) {
         success: false,
         message: `Error generating PDF: ${error instanceof Error ? error.message : "Unknown error"}`,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

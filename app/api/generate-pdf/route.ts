@@ -50,11 +50,11 @@ export async function POST(request: NextRequest) {
 
     const page = await browser.newPage();
     await page.setContent(html, {
-      waitUntil: "networkidle0",
+      waitUntil: "load",
       timeout: 30000,
     });
 
-    await page.evaluateHandle("document.fonts.ready");
+    await page.evaluate(() => document.fonts.ready);
 
     const pdfBuffer = await page.pdf({
       format: "A4",

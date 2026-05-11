@@ -6,11 +6,13 @@ import { Roboto_Mono } from "next/font/google";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 
+/** Must match `RESUME_FONT_MONO_CSS_VAR` in `app/utils/resumeFontFamily.ts`. */
 const robotoMono = Roboto_Mono({
   subsets: ["latin"],
   weight: ["400", "500", "700"],
   display: "swap",
   preload: true,
+  variable: "--font-resume-mono",
 });
 
 export const metadata: Metadata = {
@@ -138,8 +140,16 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" suppressHydrationWarning className={robotoMono.className}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${robotoMono.variable} ${robotoMono.className}`}
+    >
       <head>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

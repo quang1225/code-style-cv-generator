@@ -1,8 +1,13 @@
 import { ResumeData } from "../types/resume";
+import {
+  preserveHyphenBreaks,
+  preserveHyphenBreaksInHtml,
+} from "./preserveHyphenBreaks";
+import { RESUME_FONT_FAMILY_PDF } from "./resumeFontFamily";
 
 const RESUME_CSS = `
   * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  html, body { margin: 0; padding: 0; font-family: 'Roboto Mono', monospace; background-color: #2d3748 !important; min-height: 100vh; }
+  html, body { margin: 0; padding: 0; font-family: ${RESUME_FONT_FAMILY_PDF}; background-color: #2d3748 !important; min-height: 100vh; }
   @page { size: A4; margin: 0; }
   .pdf-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: #2d3748; z-index: -1; }
   #resume-content {
@@ -66,7 +71,7 @@ const RESUME_CSS = `
 `;
 
 function escapeHtml(text: string): string {
-  return text
+  return preserveHyphenBreaks(text)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -77,9 +82,11 @@ const LINE_BREAK_SPACER =
   '<span class="line-break-spacer" style="display:block;height:0.5em;"></span>';
 
 function normalizeHtml(html: string): string {
-  return html
-    .replace(/&nbsp;/g, " ")
-    .replace(/&#160;/g, " ")
+  return preserveHyphenBreaksInHtml(
+    html
+      .replace(/&nbsp;/g, " ")
+      .replace(/&#160;/g, " ")
+  )
     .replace(/\n/g, "<br>")
     .replace(/<p>\s*<br>\s*<\/p>/gi, '<p class="resume-spacer">&nbsp;</p>')
     .replace(/<p>\s*<\/p>/g, '<p class="resume-spacer">&nbsp;</p>')
@@ -161,7 +168,7 @@ export function resumeToHtml(data: ResumeData): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=794">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&amp;family=Noto+Color+Emoji&amp;display=swap" rel="stylesheet">
   <style>${RESUME_CSS}</style>
 </head>
 <body>

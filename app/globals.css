@@ -333,7 +333,8 @@
 
   /* Resume preview rich text styles */
   .resume-rich-text {
-    font-family: var(--main-font-family);
+    /* Inherit Roboto Mono + Noto Color Emoji stack from #resume-content */
+    font-family: inherit;
     font-size: inherit;
     line-height: inherit;
     color: inherit;

@@ -2,6 +2,11 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import { ResumeData } from "../types/resume";
+import {
+  preserveHyphenBreaks,
+  preserveHyphenBreaksInHtml,
+} from "../utils/preserveHyphenBreaks";
+import { RESUME_FONT_FAMILY_PREVIEW } from "../utils/resumeFontFamily";
 
 interface ResumePreviewProps {
   data: ResumeData;
@@ -91,14 +96,14 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
       return (
         <div
           className="resume-rich-text"
-          dangerouslySetInnerHTML={{ __html: text }}
+          dangerouslySetInnerHTML={{ __html: preserveHyphenBreaksInHtml(text) }}
         />
       );
     }
     // Otherwise, treat as plain text with line breaks
     return text.split("\n").map((line, index) => (
       <React.Fragment key={index}>
-        {line}
+        {preserveHyphenBreaks(line)}
         {index < text.split("\n").length - 1 && <br />}
       </React.Fragment>
     ));
@@ -120,7 +125,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
             rel="noopener noreferrer"
             className="text-blue-400 hover:text-blue-300 underline decoration-1"
           >
-            {text}
+            {preserveHyphenBreaks(text)}
           </a>
         );
       }
@@ -137,6 +142,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
         id="resume-content"
         className="text-xs font-mono shadow-2xl relative"
         style={{
+          fontFamily: RESUME_FONT_FAMILY_PREVIEW,
           backgroundColor: "#2d3748",
           color: "#4fd1c7",
           padding: "1.5rem", // Tighter padding to save page breaks
@@ -185,29 +191,33 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                   <span className="text-white">CV</span>
                   <span className="text-green-400">&gt;</span>
                 </div>
-                <div className="text-xl text-white font-bold">{data.name}</div>
-                <div className="text-xs text-gray-400">{data.title}</div>
+                <div className="text-xl text-white font-bold">
+                  {preserveHyphenBreaks(data.name)}
+                </div>
+                <div className="text-xs text-gray-400">
+                  {preserveHyphenBreaks(data.title)}
+                </div>
               </div>
               <div className="basic-info text-left text-[11px] text-gray-300 space-y-0.5">
                 {data.gender && (
                   <div>
-                    <span>👤 Gender: {data.gender}</span>
+                    <span>👤 Gender: {preserveHyphenBreaks(data.gender)}</span>
                   </div>
                 )}
                 {data.phone && (
                   <div>
-                    <span>📱 Phone: {data.phone}</span>
+                    <span>📱 Phone: {preserveHyphenBreaks(data.phone)}</span>
                   </div>
                 )}
                 {data.email && (
                   <div>
-                    <span>📧 Email: {data.email}</span>
+                    <span>📧 Email: {preserveHyphenBreaks(data.email)}</span>
                   </div>
                 )}
                 {data.location && (
                   <div>
                     <span className="whitespace-nowrap">
-                      📍 Location: {data.location}
+                      📍 Location: {preserveHyphenBreaks(data.location)}
                     </span>
                   </div>
                 )}
@@ -274,13 +284,13 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                         <div className="mb-1">
                           <div className="flex justify-between items-start mb-0.5 gap-2">
                             <h3 className="text-white font-semibold text-xs flex-1">
-                              {job.position}
+                              {preserveHyphenBreaks(job.position)}
                             </h3>
                             <span
                               className="font-bold text-xs prevent-period-break whitespace-nowrap"
                               style={{ color: "#8b5cf6" }}
                             >
-                              {job.period}
+                              {preserveHyphenBreaks(job.period)}
                             </span>
                           </div>
                           <p className="text-gray-400 text-xs">
@@ -288,7 +298,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                               style={{ color: "#ef4444" }}
                               className="font-semibold"
                             >
-                              🏢 {job.company}
+                              🏢 {preserveHyphenBreaks(job.company)}
                             </span>
                           </p>
                         </div>
@@ -307,7 +317,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                 {data.customSections?.map((section, index) => (
                   <section key={section.id}>
                     <h2 className="text-orange-400 text-sm font-bold mb-2">
-                      /{section.title.toLowerCase()}
+                      /{preserveHyphenBreaks(section.title.toLowerCase())}
                     </h2>
                     <div className="space-y-3">
                       {section.items?.map((item, itemIndex) => (
@@ -323,7 +333,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                             <div className="flex justify-between items-start mb-0.5 gap-2">
                               {item.title && (
                                 <h3 className="text-white font-semibold text-xs flex-1 min-w-0">
-                                  {item.title}
+                                  {preserveHyphenBreaks(item.title)}
                                 </h3>
                               )}
                               {item.period && (
@@ -331,7 +341,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                                   className="font-bold text-xs prevent-period-break whitespace-nowrap shrink-0"
                                   style={{ color: "#8b5cf6" }}
                                 >
-                                  {item.period}
+                                  {preserveHyphenBreaks(item.period)}
                                 </span>
                               )}
                             </div>

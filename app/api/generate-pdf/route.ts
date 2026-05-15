@@ -1,23 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ResumeData } from "@/app/types/resume";
+import { buildPdfFilename } from "@/app/utils/pdfFilename";
 import { resumeToHtml } from "@/app/utils/resumeToHtml";
 
 export const maxDuration = 60;
-
-function formatNameForFilename(fullName: string): string {
-  if (!fullName || fullName.trim() === "") return "Resume";
-  const normalizedName = fullName
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
-    .replace(/Đ/g, "D");
-  const fileName = normalizedName
-    .replace(/\s+/g, "_")
-    .replace(/[^a-zA-Z0-9_]/g, "")
-    .replace(/_+/g, "_")
-    .replace(/^_|_$/g, "");
-  return fileName || "Resume";
-}
 
 /**
  * A4 at 96 CSS pixels/inch. `deviceScaleFactor: 2` upscales raster content
@@ -49,7 +35,11 @@ async function launchBrowser() {
   return puppeteer.default.launch({
     headless: true,
     defaultViewport: PDF_VIEWPORT,
-    args: ["--no-sandbox", "--disable-setuid-sandbox", "--font-render-hinting=none"],
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--font-render-hinting=none",
+    ],
   });
 }
 
@@ -91,10 +81,7 @@ export async function POST(request: NextRequest) {
 
     await browser.close();
 
-    const fileName = formatNameForFilename(data.name);
-    const date = new Date();
-    const dateStr = `${String(date.getDate()).padStart(2, "0")}_${String(date.getMonth() + 1).padStart(2, "0")}_${date.getFullYear()}`;
-    const filename = `${fileName}_CV-${dateStr}.pdf`;
+    const filename = buildPdfFilename(data.name);
 
     return new NextResponse(Buffer.from(pdfBuffer), {
       status: 200,

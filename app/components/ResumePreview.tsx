@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { ResumeData } from "../types/resume";
 import {
+  normalizeNbsp,
   preventHyphenBreaks,
   preventHyphenBreaksInHtml,
 } from "../utils/preserveHyphenBreaks";
@@ -96,15 +97,18 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
       return (
         <div
           className="resume-rich-text"
-          dangerouslySetInnerHTML={{ __html: preventHyphenBreaksInHtml(text) }}
+          dangerouslySetInnerHTML={{
+            __html: preventHyphenBreaksInHtml(normalizeNbsp(text)),
+          }}
         />
       );
     }
     // Otherwise, treat as plain text with line breaks
-    return text.split("\n").map((line, index) => (
+    const normalized = normalizeNbsp(text);
+    return normalized.split("\n").map((line, index, arr) => (
       <React.Fragment key={index}>
         {preventHyphenBreaks(line)}
-        {index < text.split("\n").length - 1 && <br />}
+        {index < arr.length - 1 && <br />}
       </React.Fragment>
     ));
   }, []);
@@ -123,7 +127,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
             href={text}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-400 hover:text-blue-300 underline decoration-1"
+            className="text-blue-400 hover:text-blue-300 underline decoration-1 break-all"
           >
             {preventHyphenBreaks(text)}
           </a>
@@ -185,20 +189,20 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                   <div className="w-20 h-20 rounded-full bg-gray-600 border-2 border-green-400 flex items-center justify-center"></div>
                 )}
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <div className="text-2xl font-bold mb-1">
                   <span className="text-green-400">&lt;</span>
                   <span className="text-white">CV</span>
                   <span className="text-green-400">&gt;</span>
                 </div>
-                <div className="text-xl text-white font-bold">
+                <div className="text-xl text-white font-bold break-words">
                   {preventHyphenBreaks(data.name)}
                 </div>
-                <div className="text-xs text-gray-400">
+                <div className="text-xs text-gray-400 break-words">
                   {preventHyphenBreaks(data.title)}
                 </div>
               </div>
-              <div className="basic-info text-left text-[11px] text-gray-300 space-y-0.5">
+              <div className="basic-info text-left text-[11px] text-gray-300 space-y-0.5 min-w-0 shrink max-w-full sm:max-w-[42%] break-words">
                 {data.gender && (
                   <div>
                     <span>👤 Gender: {preventHyphenBreaks(data.gender)}</span>
@@ -216,7 +220,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                 )}
                 {data.location && (
                   <div>
-                    <span className="whitespace-nowrap">
+                    <span className="break-words">
                       📍 Location: {preventHyphenBreaks(data.location)}
                     </span>
                   </div>
@@ -256,16 +260,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
             >
               {/* Left Column */}
               <div className="space-y-4 flex-[6] min-w-0">
-                {/* Summary */}
-                <section>
-                  <h2 className="text-orange-400 text-sm font-bold mb-2">
-                    /summary
-                  </h2>
-                  <div className="text-gray-300 leading-relaxed text-[11px]">
-                    {formatLinkText(data.summary)}
-                  </div>
-                </section>
-
                 {/* Work Experience */}
                 <section>
                   <h2 className="text-orange-400 text-sm font-bold mb-2">
@@ -282,8 +276,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                         }
                       >
                         <div className="mb-1">
-                          <div className="flex justify-between items-start mb-0.5 gap-2">
-                            <h3 className="text-white font-semibold text-xs flex-1">
+                          <div className="flex justify-between items-start mb-0.5 gap-2 flex-wrap">
+                            <h3 className="text-white font-semibold text-xs flex-1 min-w-0 break-words basis-0">
                               {preventHyphenBreaks(job.position)}
                             </h3>
                             <span
@@ -293,7 +287,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                               {preventHyphenBreaks(job.period)}
                             </span>
                           </div>
-                          <p className="text-gray-400 text-xs">
+                          <p className="text-gray-400 text-xs break-words min-w-0">
                             <span
                               style={{ color: "#ef4444" }}
                               className="font-semibold"
@@ -302,7 +296,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                             </span>
                           </p>
                         </div>
-                        <div className="text-gray-300 text-[11px] leading-relaxed">
+                        <div className="text-gray-300 text-[11px] leading-relaxed break-words min-w-0">
                           {formatLinkText(job.description)}
                         </div>
                       </div>
@@ -313,6 +307,16 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
 
               {/* Right Column */}
               <div className="space-y-4 flex-[4] min-w-0">
+                {/* Summary */}
+                <section>
+                  <h2 className="text-orange-400 text-sm font-bold mb-2">
+                    /summary
+                  </h2>
+                  <div className="text-gray-300 leading-relaxed text-[11px] break-words min-w-0">
+                    {formatLinkText(data.summary)}
+                  </div>
+                </section>
+
                 {/* Custom Sections */}
                 {data.customSections?.map((section, index) => (
                   <section key={section.id}>
@@ -330,9 +334,9 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                           }
                         >
                           <div className="mb-1">
-                            <div className="flex justify-between items-start mb-0.5 gap-2">
+                            <div className="flex justify-between items-start mb-0.5 gap-2 flex-wrap">
                               {item.title && (
-                                <h3 className="text-white font-semibold text-xs flex-1 min-w-0">
+                                <h3 className="text-white font-semibold text-xs flex-1 min-w-0 break-words basis-0">
                                   {preventHyphenBreaks(item.title)}
                                 </h3>
                               )}
@@ -347,7 +351,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
                             </div>
                           </div>
                           {item.description && (
-                            <div className="text-gray-300 text-[11px] leading-relaxed">
+                            <div className="text-gray-300 text-[11px] leading-relaxed break-words min-w-0">
                               {formatLinkText(item.description)}
                             </div>
                           )}

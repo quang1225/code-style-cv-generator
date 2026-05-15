@@ -425,19 +425,27 @@
   /* Better text wrapping for rich text content */
   .resume-rich-text {
     text-wrap: pretty;
-    hyphens: auto;
+    -webkit-hyphens: none;
+    hyphens: none;
     word-break: normal;
     overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
   }
 
   /* General resume text formatting */
   #resume-content {
     text-wrap: pretty;
-    hyphens: auto;
+    -webkit-hyphens: none;
+    hyphens: none;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
   }
 
   #resume-content a {
     text-decoration-thickness: 1px;
+    overflow-wrap: anywhere;
   }
 
   /* Dark mode support for react-image-crop */

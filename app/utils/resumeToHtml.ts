@@ -1,5 +1,6 @@
 import { ResumeData } from "../types/resume";
 import {
+  normalizeNbsp,
   preserveHyphenBreaks,
   preserveHyphenBreaksInHtml,
 } from "./preserveHyphenBreaks";
@@ -29,9 +30,25 @@ const RESUME_CSS = `
     min-height: 1122px;
     min-width: 794px;
     width: 794px;
+    max-width: 100%;
     font-size: 12px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    -webkit-hyphens: none;
+    hyphens: none;
+    word-break: normal;
   }
-  .resume-rich-text { font-size: 11px; line-height: 1.625; color: #d1d5db; }
+  .resume-rich-text {
+    font-size: 11px;
+    line-height: 1.625;
+    color: #d1d5db;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
+    -webkit-hyphens: none;
+    hyphens: none;
+    word-break: normal;
+  }
   .resume-rich-text strong { font-weight: bold; }
   .resume-rich-text em { font-style: italic; }
   .resume-rich-text p { margin: 0; padding: 0; display: block; }
@@ -41,8 +58,8 @@ const RESUME_CSS = `
   .resume-rich-text br { display: block; margin: 0.25em 0; }
   .resume-rich-text .line-break-spacer { display: block; height: 0.5em; }
   .resume-rich-text .resume-spacer { min-height: 1em; }
-  .resume-rich-text a { color: #3b82f6; text-decoration: underline; text-decoration-thickness: 1px; }
-  .copyright-link { color: inherit !important; text-decoration: underline; text-decoration-thickness: 1px; }
+  .resume-rich-text a { color: #3b82f6; text-decoration: underline; text-decoration-thickness: 1px; overflow-wrap: anywhere; }
+  .copyright-link { color: inherit !important; text-decoration: underline; text-decoration-thickness: 1px; overflow-wrap: anywhere; }
   .resume-rich-text .ql-indent-1 { padding-left: 2em; }
   .resume-rich-text .ql-indent-2 { padding-left: 4em; }
   .resume-rich-text .ql-indent-3 { padding-left: 6em; }
@@ -75,15 +92,15 @@ const RESUME_CSS = `
   .min-w-0 { min-width: 0; }
   .whitespace-nowrap { white-space: nowrap; }
   .shrink-0 { flex-shrink: 0; }
-  .title-period-row { display: flex; flex-wrap: nowrap; justify-content: space-between; align-items: flex-start; gap: 0.5rem; }
-  .title-period-row .title { flex: 1; min-width: 0; font-weight: 600; font-size: 12px; }
+  .title-period-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 0.5rem; }
+  .title-period-row .title { flex: 1; min-width: 0; font-weight: 600; font-size: 12px; overflow-wrap: break-word; word-wrap: break-word; -webkit-hyphens: none; hyphens: none; word-break: normal; }
   .title-period-row .period { flex-shrink: 0; white-space: nowrap; font-weight: bold; font-size: 12px; }
   .period-item { border-bottom: 1px solid #4b5563; padding-bottom: 1.25rem; }
   .period-item:last-child { border-bottom: none; padding-bottom: 0; }
 `;
 
 function escapeHtml(text: string): string {
-  return preserveHyphenBreaks(text)
+  return preserveHyphenBreaks(normalizeNbsp(text))
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -94,9 +111,7 @@ const LINE_BREAK_SPACER =
   '<span class="line-break-spacer" style="display:block;height:0.5em;"></span>';
 
 function normalizeHtml(html: string): string {
-  return preserveHyphenBreaksInHtml(
-    html.replace(/&nbsp;/g, " ").replace(/&#160;/g, " "),
-  )
+  return preserveHyphenBreaksInHtml(normalizeNbsp(html))
     .replace(/\n/g, "<br>")
     .replace(/<p>\s*<br>\s*<\/p>/gi, '<p class="resume-spacer">&nbsp;</p>')
     .replace(/<p>\s*<\/p>/g, '<p class="resume-spacer">&nbsp;</p>')
@@ -123,7 +138,7 @@ export function resumeToHtml(data: ResumeData): string {
             <span class="title text-white">${escapeHtml(job.position)}</span>
             <span class="period text-purple">${escapeHtml(job.period)}</span>
           </div>
-          <p class="text-gray-400" style="font-size: 12px;">
+          <p class="text-gray-400" style="font-size: 12px; overflow-wrap: break-word; word-wrap: break-word;">
             <span class="text-red font-semibold">🏢 ${escapeHtml(job.company)}</span>
           </p>
         </div>
@@ -205,22 +220,16 @@ export function resumeToHtml(data: ResumeData): string {
             <div class="mb-1" style="font-size: 24px; font-weight: bold;">
               <span class="text-green">&lt;</span><span class="text-white">CV</span><span class="text-green">&gt;</span>
             </div>
-            <div class="text-white font-bold" style="font-size: 20px;">${escapeHtml(data.name)}</div>
-            <div class="text-gray-400" style="font-size: 12px;">${escapeHtml(data.title)}</div>
+            <div class="text-white font-bold" style="font-size: 20px; overflow-wrap: break-word; word-wrap: break-word;">${escapeHtml(data.name)}</div>
+            <div class="text-gray-400" style="font-size: 12px; overflow-wrap: break-word; word-wrap: break-word;">${escapeHtml(data.title)}</div>
           </div>
-          <div style="font-size: 11px; color: #d1d5db; display: flex; flex-direction: column; gap: 0.125rem;">
+          <div class="resume-basic-info" style="font-size: 11px; color: #d1d5db; display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; flex-shrink: 1; max-width: 42%; overflow-wrap: break-word; word-wrap: break-word;">
             ${basicInfoHtml}
           </div>
         </div>
       </div>
       <div class="flex gap-4" style="align-items: flex-start;">
         <div class="flex gap-4 min-w-0" style="flex: 6; flex-direction: column;">
-          <section>
-            <h2 class="text-orange font-bold mb-2" style="font-size: 14px;">/summary</h2>
-            <div class="resume-rich-text text-gray-300" style="font-size: 11px; line-height: 1.625;">
-              ${formatContent(data.summary)}
-            </div>
-          </section>
           <section>
             <h2 class="text-orange font-bold mb-2" style="font-size: 14px;">/work experience</h2>
             <div class="flex flex-col gap-5">
@@ -229,6 +238,12 @@ export function resumeToHtml(data: ResumeData): string {
           </section>
         </div>
         <div class="flex min-w-0 space-y-4" style="flex: 4; flex-direction: column;">
+          <section>
+            <h2 class="text-orange font-bold mb-2" style="font-size: 14px;">/summary</h2>
+            <div class="resume-rich-text text-gray-300" style="font-size: 11px; line-height: 1.625;">
+              ${formatContent(data.summary)}
+            </div>
+          </section>
           ${customSectionsHtml}
         </div>
       </div>

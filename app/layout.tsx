@@ -1,7 +1,6 @@
 import "./globals.css";
 import React from "react";
 import { ThemeProvider } from "./components/ThemeProvider";
-import { ThemeToggle } from "./components/ThemeToggle";
 import { Roboto_Mono } from "next/font/google";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
@@ -162,7 +161,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ThemeToggle />
           {children}
         </ThemeProvider>
 

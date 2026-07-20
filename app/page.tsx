@@ -1,4 +1,5 @@
 import dynamic from "next/dynamic";
+import { ThemeToggle } from "./components/ThemeToggle";
 
 const HomeClient = dynamic(() => import("./components/HomeClient"), {
   ssr: true,
@@ -15,9 +16,10 @@ export default function Home() {
     <main className="min-h-screen bg-background">
       <div className="container mx-auto py-8 px-4">
         <header className="mb-8 text-center">
-          <h1 className="text-3xl font-bold mb-4">
-            Code Style CV Generator
-          </h1>
+          <div className="mb-4 flex items-center justify-center gap-3">
+            <h1 className="text-3xl font-bold">Code Style CV Generator</h1>
+            <ThemeToggle />
+          </div>
           <p className="text-muted-foreground mb-6">
             Generate a developer-style resume with terminal aesthetics
           </p>

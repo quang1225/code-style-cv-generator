@@ -61,7 +61,7 @@ export function ThemeToggle() {
         const maxRadius =
           Math.hypot(
             Math.max(x, window.innerWidth - x),
-            Math.max(y, window.innerHeight - y)
+            Math.max(y, window.innerHeight - y),
           ) + 50; // Small buffer for clean edges
 
         overlay.style.clipPath = `circle(${maxRadius}px at ${x}px ${y}px)`;
@@ -81,7 +81,7 @@ export function ThemeToggle() {
         }, 150);
       }, 500);
     },
-    [isAnimating, setTheme]
+    [isAnimating, setTheme],
   );
 
   const handleThemeToggle = useCallback(
@@ -100,11 +100,11 @@ export function ThemeToggle() {
         // Set CSS custom properties more efficiently
         document.documentElement.style.setProperty(
           "--theme-toggle-x",
-          `${x}px`
+          `${x}px`,
         );
         document.documentElement.style.setProperty(
           "--theme-toggle-y",
-          `${y}px`
+          `${y}px`,
         );
       }
 
@@ -132,7 +132,7 @@ export function ThemeToggle() {
         await animateThemeChange(newTheme);
       }
     },
-    [theme, isAnimating, animateThemeChange, setTheme]
+    [theme, isAnimating, animateThemeChange, setTheme],
   );
 
   // Cleanup overlay on unmount
@@ -156,7 +156,7 @@ export function ThemeToggle() {
       size="icon"
       onClick={handleThemeToggle}
       disabled={isAnimating}
-      className={`fixed top-4 right-4 z-50 bg-background border-border hover:bg-accent hover:text-accent-foreground transition-all duration-200 ease-out will-change-transform hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-background disabled:hover:text-foreground disabled:hover:shadow-none ${
+      className={`shrink-0 bg-background border-border hover:bg-accent hover:text-accent-foreground transition-all duration-200 ease-out will-change-transform hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-background disabled:hover:text-foreground disabled:hover:shadow-none ${
         isAnimating ? "shadow-md" : ""
       }`}
       title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}

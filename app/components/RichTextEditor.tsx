@@ -120,7 +120,7 @@ export default function RichTextEditor({
         ["clean"], // remove formatting button
       ],
     }),
-    []
+    [],
   );
 
   // Define the formats that are allowed

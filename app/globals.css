@@ -394,15 +394,30 @@
     padding-left: 10em;
   }
 
-  /* Resume preview link styles */
-  .resume-rich-text a {
-    color: #3b82f6;
+  /* Resume preview link styles — theme-aware via #resume-content CSS vars */
+  #resume-content .resume-rich-text a {
+    color: var(--resume-accent-blue);
     text-decoration: underline;
     text-decoration-thickness: 1px;
   }
 
-  .resume-rich-text a:hover {
-    color: #1d4ed8;
+  #resume-content .resume-rich-text a:hover {
+    opacity: 0.85;
+  }
+
+  /* Light = B&W print: neutralize Quill inline colors in preview only (form editor unchanged). */
+  #resume-content[data-resume-theme="light"] .resume-rich-text,
+  #resume-content[data-resume-theme="light"] .resume-rich-text * {
+    color: inherit !important;
+    background-color: transparent !important;
+  }
+
+  #resume-content[data-resume-theme="light"] .resume-rich-text {
+    color: var(--resume-body-text) !important;
+  }
+
+  #resume-content[data-resume-theme="light"] .resume-rich-text a {
+    color: var(--resume-accent-blue) !important;
   }
 
   /* Copyright link - same color as text */

@@ -1,7 +1,12 @@
 "use client";
 
-import { useState, useCallback, lazy, Suspense } from "react";
+import { useState, useCallback, useEffect, lazy, Suspense } from "react";
+import { useTheme } from "next-themes";
 import { ResumeData } from "../types/resume";
+import {
+  normalizeResumeTheme,
+  type ResumeThemeId,
+} from "../utils/resumeTheme";
 import {
   Card,
   CardContent,
@@ -20,21 +25,29 @@ const ResumeForm = lazy(() => import("./ResumeForm"));
 
 function PdfButton({
   resumeData,
+  theme,
+  themeReady,
   isGeneratingPDF,
   onStatusChange,
   onGeneratingChange,
 }: {
   resumeData: ResumeData;
+  theme: ResumeThemeId | null;
+  themeReady: boolean;
   isGeneratingPDF: boolean;
-  onStatusChange: (status: { type: "success" | "error" | null; message: string }) => void;
+  onStatusChange: (status: {
+    type: "success" | "error" | null;
+    message: string;
+  }) => void;
   onGeneratingChange: (generating: boolean) => void;
 }) {
   const handleGeneratePDF = useCallback(async () => {
+    if (!themeReady || theme == null) return;
     try {
       onGeneratingChange(true);
       onStatusChange({ type: null, message: "" });
       const { generatePDF } = await import("../utils/pdfGenerator");
-      const result = await generatePDF(resumeData);
+      const result = await generatePDF(resumeData, theme);
       onStatusChange({
         type: result.success ? "success" : "error",
         message: result.message,
@@ -49,14 +62,14 @@ function PdfButton({
     } finally {
       onGeneratingChange(false);
     }
-  }, [resumeData, onStatusChange, onGeneratingChange]);
+  }, [resumeData, theme, themeReady, onStatusChange, onGeneratingChange]);
 
   return (
     <Button
       onClick={handleGeneratePDF}
       className="w-full"
       size="lg"
-      disabled={isGeneratingPDF}
+      disabled={isGeneratingPDF || !themeReady || theme == null}
     >
       {isGeneratingPDF ? (
         <>
@@ -77,6 +90,8 @@ function PdfButton({
 }
 
 export default function HomeClient() {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [resumeData, setResumeData] = useState<ResumeData>(
     defaultResumeData as ResumeData
   );
@@ -85,6 +100,15 @@ export default function HomeClient() {
     type: "success" | "error" | null;
     message: string;
   }>({ type: null, message: "" });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const themeReady = mounted && resolvedTheme != null;
+  const resumeTheme: ResumeThemeId | null = themeReady
+    ? normalizeResumeTheme(resolvedTheme)
+    : null;
 
   const handleUpdateResume = useCallback((newData: ResumeData) => {
     setResumeData(newData);
@@ -136,6 +160,8 @@ export default function HomeClient() {
               )}
               <PdfButton
                 resumeData={resumeData}
+                theme={resumeTheme}
+                themeReady={themeReady}
                 isGeneratingPDF={isGeneratingPDF}
                 onStatusChange={setPdfStatus}
                 onGeneratingChange={setIsGeneratingPDF}
@@ -157,7 +183,7 @@ export default function HomeClient() {
                 <div className="transform scale-[0.47] sm:scale-[0.6] md:scale-100 origin-top-left w-fit md:w-full h-[527px] sm:h-[673px] md:h-auto">
                   <Suspense
                     fallback={
-                      <div className="w-[794px] min-h-[400px] bg-[#2d3748] rounded-lg animate-pulse" />
+                      <div className="w-[794px] min-h-[400px] bg-muted rounded-lg animate-pulse" />
                     }
                   >
                     <ResumePreview data={resumeData} />

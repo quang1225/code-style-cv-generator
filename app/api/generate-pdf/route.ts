@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ResumeData } from "@/app/types/resume";
 import { buildPdfFilename } from "@/app/utils/pdfFilename";
 import { resumeToHtml } from "@/app/utils/resumeToHtml";
+import { normalizeResumeTheme } from "@/app/utils/resumeTheme";
 
 export const maxDuration = 60;
 
@@ -45,8 +46,16 @@ async function launchBrowser() {
 
 export async function POST(request: NextRequest) {
   try {
-    const data: ResumeData = await request.json();
-    const html = resumeToHtml(data);
+    const body = await request.json();
+    const resumeData = (body?.resumeData ?? null) as ResumeData | null;
+    if (!resumeData || typeof resumeData !== "object") {
+      return NextResponse.json(
+        { success: false, message: "Missing resumeData in request body" },
+        { status: 400 },
+      );
+    }
+    const theme = normalizeResumeTheme(body?.theme);
+    const html = resumeToHtml(resumeData, theme);
 
     const browser = await launchBrowser();
 
@@ -81,7 +90,7 @@ export async function POST(request: NextRequest) {
 
     await browser.close();
 
-    const filename = buildPdfFilename(data.name);
+    const filename = buildPdfFilename(resumeData.name);
 
     return new NextResponse(Buffer.from(pdfBuffer), {
       status: 200,

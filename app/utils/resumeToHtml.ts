@@ -5,8 +5,13 @@ import {
   preserveHyphenBreaksInHtml,
 } from "./preserveHyphenBreaks";
 import { RESUME_FONT_FAMILY_PDF } from "./resumeFontFamily";
+import {
+  getResumeTheme,
+  normalizeResumeTheme,
+  toResumeCssText,
+} from "./resumeTheme";
 
-const RESUME_CSS = `
+const RESUME_CSS = (cssVars: string) => `
   * {
     box-sizing: border-box;
     -webkit-print-color-adjust: exact !important;
@@ -20,12 +25,23 @@ const RESUME_CSS = `
     -moz-osx-font-smoothing: grayscale;
   }
   img { image-rendering: auto; }
-  html, body { margin: 0; padding: 0; font-family: ${RESUME_FONT_FAMILY_PDF}; background-color: #2d3748 !important; min-height: 100vh; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: ${RESUME_FONT_FAMILY_PDF};
+    ${cssVars};
+    background-color: var(--resume-page-bg) !important;
+    min-height: 100vh;
+  }
   @page { size: A4; margin: 0; }
-  .pdf-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: #2d3748; z-index: -1; }
+  .pdf-bg {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: var(--resume-page-bg);
+    z-index: -1;
+  }
   #resume-content {
-    background-color: #2d3748;
-    color: #4fd1c7;
+    background-color: var(--resume-page-bg);
+    color: var(--resume-accent-teal);
     padding: 1.5rem;
     min-height: 1122px;
     min-width: 794px;
@@ -41,7 +57,7 @@ const RESUME_CSS = `
   .resume-rich-text {
     font-size: 11px;
     line-height: 1.625;
-    color: #d1d5db;
+    color: var(--resume-body-text);
     overflow-wrap: break-word;
     word-wrap: break-word;
     max-width: 100%;
@@ -58,22 +74,34 @@ const RESUME_CSS = `
   .resume-rich-text br { display: block; margin: 0.25em 0; }
   .resume-rich-text .line-break-spacer { display: block; height: 0.5em; }
   .resume-rich-text .resume-spacer { min-height: 1em; }
-  .resume-rich-text a { color: #3b82f6; text-decoration: underline; text-decoration-thickness: 1px; overflow-wrap: anywhere; }
+  .resume-rich-text a { color: var(--resume-accent-blue); text-decoration: underline; text-decoration-thickness: 1px; overflow-wrap: anywhere; }
   .copyright-link { color: inherit !important; text-decoration: underline; text-decoration-thickness: 1px; overflow-wrap: anywhere; }
+  /* Light = B&W: neutralize Quill inline colors (bold/italic/underline stay). */
+  html[data-resume-theme="light"] .resume-rich-text,
+  html[data-resume-theme="light"] .resume-rich-text * {
+    color: inherit !important;
+    background-color: transparent !important;
+  }
+  html[data-resume-theme="light"] .resume-rich-text {
+    color: var(--resume-body-text) !important;
+  }
+  html[data-resume-theme="light"] .resume-rich-text a {
+    color: var(--resume-accent-blue) !important;
+  }
   .resume-rich-text .ql-indent-1 { padding-left: 2em; }
   .resume-rich-text .ql-indent-2 { padding-left: 4em; }
   .resume-rich-text .ql-indent-3 { padding-left: 6em; }
   .resume-rich-text .ql-indent-4 { padding-left: 8em; }
   .resume-rich-text .ql-indent-5 { padding-left: 10em; }
-  .text-orange { color: #fb923c; }
-  .text-white { color: #ffffff; }
-  .text-gray-300 { color: #d1d5db; }
-  .text-gray-400 { color: #9ca3af; }
-  .text-gray-600 { color: #4b5563; }
-  .text-green { color: #4ade80; }
-  .text-purple { color: #8b5cf6; }
-  .text-red { color: #ef4444; }
-  .text-blue { color: #3b82f6; }
+  .text-orange { color: var(--resume-accent-orange); }
+  .text-white { color: var(--resume-text); }
+  .text-gray-300 { color: var(--resume-body-text); }
+  .text-gray-400 { color: var(--resume-muted-text); }
+  .text-gray-600 { color: var(--resume-copyright); }
+  .text-green { color: var(--resume-accent-green); }
+  .text-purple { color: var(--resume-accent-purple); }
+  .text-red { color: var(--resume-accent-red); }
+  .text-blue { color: var(--resume-accent-blue); }
   .flex { display: flex; }
   .flex-col { flex-direction: column; }
   .flex-1 { flex: 1; min-width: 0; }
@@ -95,7 +123,7 @@ const RESUME_CSS = `
   .title-period-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 0.5rem; }
   .title-period-row .title { flex: 1; min-width: 0; font-weight: 600; font-size: 12px; overflow-wrap: break-word; word-wrap: break-word; -webkit-hyphens: none; hyphens: none; word-break: normal; }
   .title-period-row .period { flex-shrink: 0; white-space: nowrap; font-weight: bold; font-size: 12px; }
-  .period-item { border-bottom: 1px solid #4b5563; padding-bottom: 1.25rem; }
+  .period-item { border-bottom: 1px solid var(--resume-border); padding-bottom: 1.25rem; }
   .period-item:last-child { border-bottom: none; padding-bottom: 0; }
 `;
 
@@ -128,7 +156,11 @@ function formatContent(text: string): string {
     .replace(/<br>\s*<br>/gi, `<br>${LINE_BREAK_SPACER}<br>`);
 }
 
-export function resumeToHtml(data: ResumeData): string {
+export function resumeToHtml(data: ResumeData, theme?: unknown): string {
+  const resumeTheme = normalizeResumeTheme(theme);
+  const tokens = getResumeTheme(resumeTheme);
+  const cssVars = toResumeCssText(tokens);
+
   const workExpHtml = (data.workExperience ?? [])
     .map(
       (job, index) => `
@@ -189,22 +221,22 @@ export function resumeToHtml(data: ResumeData): string {
 
   return `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-resume-theme="${resumeTheme}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=794">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&amp;family=Noto+Color+Emoji&amp;display=swap" rel="stylesheet">
-  <style>${RESUME_CSS}</style>
+  <style>${RESUME_CSS(cssVars)}</style>
 </head>
 <body>
   <div class="pdf-bg" aria-hidden="true"></div>
-  <div id="resume-content">
+  <div id="resume-content" data-resume-theme="${resumeTheme}">
     ${
       data.showCopyright
         ? `
-    <div style="position: absolute; top: 0.5rem; left: 50%; transform: translateX(-50%); font-size: 10px; color: #4b5563; z-index: 10;">
+    <div style="position: absolute; top: 0.5rem; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--resume-copyright); z-index: 10;">
       CV made with <a href="https://code-style-cv-generator.quang.work" class="copyright-link" target="_blank" rel="noopener">https://code-style-cv-generator.quang.work</a>
     </div>
     `
@@ -214,7 +246,7 @@ export function resumeToHtml(data: ResumeData): string {
       <div class="mb-5">
         <div class="flex gap-4 mb-3" style="flex-wrap: wrap; align-items: center;">
           <div class="shrink-0">
-            ${data.avatar ? `<img src="${data.avatar}" alt="Profile" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #4ade80;">` : `<div style="width: 80px; height: 80px; border-radius: 50%; background: #4b5563; border: 2px solid #4ade80;"></div>`}
+            ${data.avatar ? `<img src="${data.avatar}" alt="Profile" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--resume-accent-green);">` : `<div style="width: 80px; height: 80px; border-radius: 50%; background: var(--resume-border); border: 2px solid var(--resume-accent-green);"></div>`}
           </div>
           <div class="flex-1">
             <div class="mb-1" style="font-size: 24px; font-weight: bold;">
@@ -223,7 +255,7 @@ export function resumeToHtml(data: ResumeData): string {
             <div class="text-white font-bold" style="font-size: 20px; overflow-wrap: break-word; word-wrap: break-word;">${escapeHtml(data.name)}</div>
             <div class="text-gray-400" style="font-size: 12px; overflow-wrap: break-word; word-wrap: break-word;">${escapeHtml(data.title)}</div>
           </div>
-          <div class="resume-basic-info" style="font-size: 11px; color: #d1d5db; display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; flex-shrink: 1; max-width: 42%; overflow-wrap: break-word; word-wrap: break-word;">
+          <div class="resume-basic-info" style="font-size: 11px; color: var(--resume-body-text); display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; flex-shrink: 1; max-width: 42%; overflow-wrap: break-word; word-wrap: break-word;">
             ${basicInfoHtml}
           </div>
         </div>

@@ -40,6 +40,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.0",
+    "@ttsc/graph": "^0.26.1",
     "@types/node": "^25.8.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -48,6 +49,7 @@
     "postcss": "^8.5.14",
     "puppeteer": "^24.43.1",
     "tailwindcss": "^4.3.0",
+    "ttsc": "^0.26.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"
   },

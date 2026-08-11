@@ -17,7 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FileDown, CheckCircle, AlertCircle } from "lucide-react";
-import defaultResumeData from "../data/defaultResume.json";
+import defaultResumeData from "../data/defaultResume";
 
 // Lazy-load heavy components for better initial load performance
 const ResumePreview = lazy(() => import("./ResumePreview"));

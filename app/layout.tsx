@@ -157,7 +157,7 @@ export default function RootLayout({
       <body className="font-mono">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >

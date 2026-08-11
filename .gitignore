@@ -40,3 +40,4 @@ next-env.d.ts
 # SDD / agent scratch
 .superpowers/
 
+.pnpm-store

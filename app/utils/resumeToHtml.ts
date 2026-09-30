@@ -89,11 +89,11 @@ const RESUME_CSS = (cssVars: string) => `
   html[data-resume-theme="light"] .resume-rich-text a {
     color: var(--resume-accent-blue) !important;
   }
-  .resume-rich-text .ql-indent-1 { padding-left: 2em; }
-  .resume-rich-text .ql-indent-2 { padding-left: 4em; }
-  .resume-rich-text .ql-indent-3 { padding-left: 6em; }
-  .resume-rich-text .ql-indent-4 { padding-left: 8em; }
-  .resume-rich-text .ql-indent-5 { padding-left: 10em; }
+  .resume-rich-text .ql-indent-1 { padding-left: 1em; }
+  .resume-rich-text .ql-indent-2 { padding-left: 2em; }
+  .resume-rich-text .ql-indent-3 { padding-left: 3em; }
+  .resume-rich-text .ql-indent-4 { padding-left: 4em; }
+  .resume-rich-text .ql-indent-5 { padding-left: 5em; }
   .text-orange { color: var(--resume-accent-orange); }
   .text-white { color: var(--resume-text); }
   .text-gray-300 { color: var(--resume-body-text); }
@@ -184,13 +184,15 @@ const HARVARD_CSS = `
   .harvard-name { text-align: center; font-size: 20pt; font-weight: 700; margin: 0; letter-spacing: 0.03em; }
   .harvard-title { text-align: center; font-size: 11pt; margin: 2px 0 0; }
   .harvard-contact { text-align: center; font-size: 10.5pt; margin: 4px 0 0; }
-  .harvard-section { margin-top: 14px; }
+  .harvard-section { margin-top: 24px; }
   .harvard-section h2 {
     font-size: 11pt; font-weight: 700; letter-spacing: 0.08em;
     border-bottom: 1px solid #000000; margin: 0 0 6px; padding-bottom: 1px;
   }
+  .harvard-body { padding-left: 1em; }
   .harvard-entry { margin-bottom: 12px; }
   .harvard-entry:last-child { margin-bottom: 0; }
+  .harvard-company + .harvard-company { margin-top: 16px; }
   .harvard-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
   .harvard-row .left { font-weight: 700; min-width: 0; }
   .harvard-row .right { flex-shrink: 0; white-space: nowrap; }
@@ -203,6 +205,11 @@ const HARVARD_CSS = `
   .resume-rich-text ul, .resume-rich-text ol { margin: 4px 0 0; padding-left: 1.2em; }
   .resume-rich-text li { margin: 0.15em 0; }
   .resume-rich-text a { color: #000000; text-decoration: underline; }
+  .resume-rich-text .ql-indent-1 { padding-left: 1em; }
+  .resume-rich-text .ql-indent-2 { padding-left: 2em; }
+  .resume-rich-text .ql-indent-3 { padding-left: 3em; }
+  .resume-rich-text .ql-indent-4 { padding-left: 4em; }
+  .resume-rich-text .ql-indent-5 { padding-left: 5em; }
   html[data-resume-style="harvard"] .resume-rich-text,
   html[data-resume-style="harvard"] .resume-rich-text * {
     color: #000000 !important;
@@ -216,6 +223,7 @@ function harvardEntry(
   period: string,
   sub: string,
   description: string,
+  entryClass = "harvard-entry",
 ): string {
   const row =
     left || period
@@ -225,11 +233,12 @@ function harvardEntry(
   const body = hasRichText(description)
     ? `<div class="resume-rich-text">${formatContent(description)}</div>`
     : "";
-  return `<div class="harvard-entry">${row}${subLine}${body}</div>`;
+  return `<div class="${entryClass}">${row}${subLine}${body}</div>`;
 }
 
-function harvardSection(title: string, body: string): string {
-  return `<section class="harvard-section"><h2>${escapeHtml(title)}</h2>${body}</section>`;
+function harvardSection(title: string, body: string, indent = false): string {
+  const content = indent ? `<div class="harvard-body">${body}</div>` : body;
+  return `<section class="harvard-section"><h2>${escapeHtml(title)}</h2>${content}</section>`;
 }
 
 function harvardResumeHtml(data: ResumeData): string {
@@ -260,9 +269,11 @@ function harvardResumeHtml(data: ResumeData): string {
               escapeHtml(job.period),
               escapeHtml(job.position),
               job.description,
+              "harvard-entry harvard-company",
             ),
           )
           .join(""),
+        true,
       ),
     );
   }
@@ -279,7 +290,7 @@ function harvardResumeHtml(data: ResumeData): string {
       )
       .join("");
     if (!items) continue;
-    sections.push(harvardSection(section.title.toUpperCase(), items));
+    sections.push(harvardSection(section.title.toUpperCase(), items, true));
   }
 
   return `

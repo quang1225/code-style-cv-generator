@@ -305,23 +305,23 @@
 
   /* Rich text editor indent support */
   .rich-text-editor .ql-indent-1 {
-    padding-left: 2em;
+    padding-left: 1em;
   }
 
   .rich-text-editor .ql-indent-2 {
-    padding-left: 4em;
+    padding-left: 2em;
   }
 
   .rich-text-editor .ql-indent-3 {
-    padding-left: 6em;
+    padding-left: 3em;
   }
 
   .rich-text-editor .ql-indent-4 {
-    padding-left: 8em;
+    padding-left: 4em;
   }
 
   .rich-text-editor .ql-indent-5 {
-    padding-left: 10em;
+    padding-left: 5em;
   }
 
   /* Rich text editor link styles */
@@ -346,6 +346,11 @@
 
   .resume-rich-text strong {
     font-weight: bold;
+  }
+
+  .resume-rich-text strong.resume-project {
+    font-style: italic;
+    font-weight: 600;
   }
 
   .resume-rich-text em {
@@ -375,23 +380,23 @@
 
   /* Resume preview indent support */
   .resume-rich-text .ql-indent-1 {
-    padding-left: 2em;
+    padding-left: 1em;
   }
 
   .resume-rich-text .ql-indent-2 {
-    padding-left: 4em;
+    padding-left: 2em;
   }
 
   .resume-rich-text .ql-indent-3 {
-    padding-left: 6em;
+    padding-left: 3em;
   }
 
   .resume-rich-text .ql-indent-4 {
-    padding-left: 8em;
+    padding-left: 4em;
   }
 
   .resume-rich-text .ql-indent-5 {
-    padding-left: 10em;
+    padding-left: 5em;
   }
 
   /* Resume preview link styles — theme-aware via #resume-content CSS vars */

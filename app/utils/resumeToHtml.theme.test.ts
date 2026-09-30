@@ -80,7 +80,15 @@ describe("resumeToHtml theme", () => {
     expect(html).toContain("#000000");
     expect(html).toContain(">SUMMARY<");
     expect(html).toContain(">EXPERIENCE<");
+    expect(html).toContain("<h2>SUMMARY</h2><div class=\"resume-rich-text\">");
+    expect(html).toContain("<h2>EXPERIENCE</h2><div class=\"harvard-body\">");
+    expect(html).toContain(".harvard-body { padding-left: 1em; }");
     expect(html).toContain("Acme");
+    expect(html).toContain("harvard-entry harvard-company");
+    expect(html).toContain(".harvard-section { margin-top: 24px; }");
+    expect(html).toContain(
+      ".harvard-company + .harvard-company { margin-top: 16px; }",
+    );
     expect(html).toContain("0900 · a@b.c · Hanoi");
     expect(html).not.toContain("🏢");
     expect(html).not.toContain("data:image");

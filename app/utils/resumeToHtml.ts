@@ -228,7 +228,7 @@ const HARVARD_CSS = `
   #resume-content {
     width: 794px; min-height: 1122px; max-width: 100%;
     padding: 48px 58px; background: #ffffff; color: #000000;
-    font-size: 11pt; line-height: 1.5;
+    font-size: 10pt; line-height: 1.5;
     overflow-wrap: break-word; word-wrap: break-word;
     -webkit-hyphens: none; hyphens: none;
   }
@@ -245,12 +245,12 @@ const HARVARD_CSS = `
     border: 1px solid #000000;
   }
   .harvard-identity { grid-column: 2; min-width: 0; }
-  .harvard-name { text-align: center; font-size: 20pt; font-weight: 700; margin: 0; letter-spacing: 0.03em; }
-  .harvard-title { text-align: center; font-size: 11pt; margin: 2px 0 0; }
-  .harvard-contact { text-align: center; font-size: 10.5pt; margin: 4px 0 0; }
+  .harvard-name { text-align: center; font-size: 17pt; font-weight: 700; margin: 0; letter-spacing: 0.03em; }
+  .harvard-title { text-align: center; font-size: 10pt; margin: 2px 0 0; }
+  .harvard-contact { text-align: center; font-size: 9.5pt; margin: 4px 0 0; }
   .harvard-section { margin-top: 24px; }
   .harvard-section h2 {
-    font-size: 11pt; font-weight: 700; letter-spacing: 0.08em;
+    font-size: 10pt; font-weight: 700; letter-spacing: 0.08em;
     border-bottom: 1px solid #000000; margin: 0 0 6px; padding-bottom: 1px;
   }
   .harvard-body { padding-left: 1em; }
@@ -261,7 +261,7 @@ const HARVARD_CSS = `
   .harvard-row .left { font-weight: 700; min-width: 0; }
   .harvard-row .right { flex-shrink: 0; white-space: nowrap; }
   .harvard-position { font-style: italic; margin: 2px 0 0; }
-  .resume-rich-text { font-size: 11pt; line-height: 1.5; color: #000000; margin-top: 4px; }
+  .resume-rich-text { font-size: 10pt; line-height: 1.5; color: #000000; margin-top: 4px; }
   .resume-rich-text strong { font-weight: 700; }
   .resume-rich-text em { font-style: italic; }
   .resume-rich-text p { margin: 0; }

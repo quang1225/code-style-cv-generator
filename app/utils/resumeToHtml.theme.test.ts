@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resumeToHtml } from "./resumeToHtml";
+import { groupProjectBlocks, resumeToHtml } from "./resumeToHtml";
 import type { ResumeData } from "../types/resume";
 
 const minimal: ResumeData = {
@@ -95,5 +95,40 @@ describe("resumeToHtml theme", () => {
     expect(html).not.toContain("#2d3748");
     expect(html).not.toContain("#4fd1c7");
     expect(html).not.toContain("Gender");
+  });
+
+  it("tightens lines inside a project and keeps the blank line between projects", () => {
+    const description =
+      '<p class="ql-indent-1"><strong style="color: rgb(74, 222, 128);">WebAI Workflow Agent</strong> — x</p>' +
+      '<p class="ql-indent-1">• Role</p>' +
+      "<p></p>" +
+      '<p class="ql-indent-1"><strong style="color: rgb(74, 222, 128);">Global Build Tool</strong> — y</p>' +
+      '<p class="ql-indent-2">• Impact</p>';
+    const grouped = groupProjectBlocks(description);
+    expect(grouped.match(/resume-project-block/g)).toHaveLength(2);
+    expect(grouped).toContain(
+      '</div><p></p><div class="resume-project-block">',
+    );
+
+    const html = resumeToHtml(
+      {
+        ...minimal,
+        workExperience: [
+          {
+            position: "Engineer",
+            company: "Acme",
+            period: "2020",
+            description,
+          },
+        ],
+      },
+      "dark",
+    );
+    expect(html).toContain(".resume-project-block { line-height: 1.4; }");
+    expect(html).toContain(
+      ".resume-project-block p + p { margin-top: 0.1em; }",
+    );
+    expect(html).toContain("resume-spacer");
+    expect(html.match(/resume-project-block/g)?.length).toBeGreaterThanOrEqual(2);
   });
 });

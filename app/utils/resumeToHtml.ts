@@ -70,6 +70,8 @@ const RESUME_CSS = (cssVars: string) => `
   .resume-rich-text em { font-style: italic; }
   .resume-rich-text p { margin: 0; padding: 0; display: block; }
   .resume-rich-text p:not(:first-child) { margin-top: 0.5em; }
+  .resume-rich-text .resume-project-block { line-height: 1.3; }
+  .resume-rich-text .resume-project-block p + p { margin-top: 0; }
   .resume-rich-text p:empty,
   .resume-rich-text p:has(br:only-child) { min-height: 1em; }
   .resume-rich-text br { display: block; margin: 0.25em 0; }
@@ -139,6 +141,57 @@ function escapeHtml(text: string): string {
 const LINE_BREAK_SPACER =
   '<span class="line-break-spacer" style="display:block;height:0.5em;"></span>';
 
+const PROJECT_TITLE =
+  /<strong\b[^>]*style\s*=\s*["'][^"']*color:\s*(?:rgb\(\s*74\s*,\s*222\s*,\s*128\s*\)|#4ade80)/i;
+
+function isBlankParagraph(p: string): boolean {
+  const inner = p.slice(p.indexOf(">") + 1, p.lastIndexOf("</"));
+  return (
+    inner
+      .replace(/<br\s*\/?>/gi, "")
+      .replace(/&nbsp;|\u00a0/gi, "")
+      .replace(/<[^>]+>/g, "")
+      .trim().length === 0
+  );
+}
+
+/** Wrap each green project title + its lines. Blank <p> stays between blocks. */
+export function groupProjectBlocks(html: string): string {
+  if (!html.includes("<p")) return html;
+  const parts: string[] = [];
+  let block: string[] = [];
+  let last = 0;
+  const flush = () => {
+    if (block.length === 0) return;
+    parts.push(`<div class="resume-project-block">${block.join("")}</div>`);
+    block = [];
+  };
+  for (const match of html.matchAll(/<p\b[^>]*>[\s\S]*?<\/p>/gi)) {
+    const p = match[0];
+    const index = match.index ?? 0;
+    const between = html.slice(last, index);
+    if (PROJECT_TITLE.test(p)) {
+      flush();
+      if (between) parts.push(between);
+      block.push(p);
+    } else if (block.length > 0 && isBlankParagraph(p)) {
+      flush();
+      if (between) parts.push(between);
+      parts.push(p);
+    } else if (block.length > 0) {
+      if (between) block.push(between);
+      block.push(p);
+    } else {
+      if (between) parts.push(between);
+      parts.push(p);
+    }
+    last = index + p.length;
+  }
+  flush();
+  parts.push(html.slice(last));
+  return parts.join("");
+}
+
 function normalizeHtml(html: string): string {
   return preserveHyphenBreaksInHtml(normalizeNbsp(html))
     .replace(/\n/g, "<br>")
@@ -150,7 +203,7 @@ function normalizeHtml(html: string): string {
 function formatContent(text: string): string {
   if (!text || typeof text !== "string") return "";
   if (text.includes("<")) {
-    return normalizeHtml(text);
+    return normalizeHtml(groupProjectBlocks(text));
   }
   return escapeHtml(text)
     .replace(/\n/g, "<br>")
@@ -202,6 +255,8 @@ const HARVARD_CSS = `
   .resume-rich-text em { font-style: italic; }
   .resume-rich-text p { margin: 0; }
   .resume-rich-text p:not(:first-child) { margin-top: 0.6em; }
+  .resume-rich-text .resume-project-block { line-height: 1.3; }
+  .resume-rich-text .resume-project-block p + p { margin-top: 0; }
   .resume-rich-text ul, .resume-rich-text ol { margin: 4px 0 0; padding-left: 1.2em; }
   .resume-rich-text li { margin: 0.15em 0; }
   .resume-rich-text a { color: #000000; text-decoration: underline; }

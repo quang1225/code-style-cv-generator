@@ -372,6 +372,14 @@
     margin-top: 0.5em;
   }
 
+  .resume-rich-text .resume-project-block {
+    line-height: 1.3;
+  }
+
+  .resume-rich-text .resume-project-block p + p {
+    margin-top: 0;
+  }
+
   /* Ensure empty paragraphs and <p><br></p> create visible line breaks */
   .resume-rich-text p:empty,
   .resume-rich-text p:has(br:only-child) {

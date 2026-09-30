@@ -9,7 +9,7 @@ import {
   preventHyphenBreaksInHtml,
 } from "../utils/preserveHyphenBreaks";
 import { RESUME_FONT_FAMILY_PREVIEW } from "../utils/resumeFontFamily";
-import { resumeToHtml } from "../utils/resumeToHtml";
+import { groupProjectBlocks, resumeToHtml } from "../utils/resumeToHtml";
 import {
   getResumeTheme,
   normalizeResumeTheme,
@@ -151,7 +151,9 @@ const CodeResumePreview: React.FC<{ data: ResumeData }> = React.memo(({ data }) 
         <div
           className="resume-rich-text"
           dangerouslySetInnerHTML={{
-            __html: preventHyphenBreaksInHtml(normalizeNbsp(text)),
+            __html: groupProjectBlocks(
+              preventHyphenBreaksInHtml(normalizeNbsp(text)),
+            ),
           }}
         />
       );

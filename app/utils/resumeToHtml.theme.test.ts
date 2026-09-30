@@ -90,8 +90,14 @@ describe("resumeToHtml theme", () => {
       ".harvard-company + .harvard-company { margin-top: 16px; }",
     );
     expect(html).toContain("0900 · a@b.c · Hanoi");
+    expect(html).toContain('class="harvard-header has-avatar"');
+    expect(html).toContain(
+      '<img class="harvard-avatar" src="data:image/png;base64,xx" alt="Profile">',
+    );
+    expect(resumeToHtml(minimal, "light", "harvard")).not.toContain(
+      'class="harvard-avatar"',
+    );
     expect(html).not.toContain("🏢");
-    expect(html).not.toContain("data:image");
     expect(html).not.toContain("#2d3748");
     expect(html).not.toContain("#4fd1c7");
     expect(html).not.toContain("Gender");

@@ -232,6 +232,7 @@ const CodeResumePreview: React.FC<{ data: ResumeData }> = React.memo(({ data }) 
           width: "794px", // Fixed width to prevent flex issues
           margin: "0", // Remove auto margin to prevent left space in PDF
           borderRadius: "8px",
+          lineHeight: "1.4",
           boxShadow:
             "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
         }}
@@ -333,7 +334,7 @@ const CodeResumePreview: React.FC<{ data: ResumeData }> = React.memo(({ data }) 
             {/* Line Numbers */}
             <div
               ref={lineNumbersRef}
-              className="text-[10px] leading-relaxed overflow-hidden"
+              className="text-[10px] leading-[1.4] overflow-hidden"
               style={{
                 color: "var(--resume-copyright)",
                 paddingTop: "1px",
@@ -412,7 +413,7 @@ const CodeResumePreview: React.FC<{ data: ResumeData }> = React.memo(({ data }) 
                           </p>
                         </div>
                         <div
-                          className="text-[11px] leading-relaxed break-words min-w-0"
+                          className="text-[11px] leading-[1.4] break-words min-w-0"
                           style={{ color: "var(--resume-body-text)" }}
                         >
                           {formatLinkText(job.description)}
@@ -434,7 +435,7 @@ const CodeResumePreview: React.FC<{ data: ResumeData }> = React.memo(({ data }) 
                     /summary
                   </h2>
                   <div
-                    className="leading-relaxed text-[11px] break-words min-w-0"
+                    className="leading-[1.4] text-[11px] break-words min-w-0"
                     style={{ color: "var(--resume-body-text)" }}
                   >
                     {formatLinkText(data.summary)}
@@ -489,7 +490,7 @@ const CodeResumePreview: React.FC<{ data: ResumeData }> = React.memo(({ data }) 
                           </div>
                           {item.description && (
                             <div
-                              className="text-[11px] leading-relaxed break-words min-w-0"
+                              className="text-[11px] leading-[1.4] break-words min-w-0"
                               style={{ color: "var(--resume-body-text)" }}
                             >
                               {formatLinkText(item.description)}

@@ -135,6 +135,28 @@ export default function HomeClient() {
             <CardDescription>
               Update your resume information and see changes in real-time
             </CardDescription>
+            <CardAction>
+              <div className="flex gap-1" role="group" aria-label="Resume style">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={resumeStyle === "code" ? "default" : "outline"}
+                  aria-pressed={resumeStyle === "code"}
+                  onClick={() => selectStyle("code")}
+                >
+                  Code style
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={resumeStyle === "harvard" ? "default" : "outline"}
+                  aria-pressed={resumeStyle === "harvard"}
+                  onClick={() => selectStyle("harvard")}
+                >
+                  Harvard
+                </Button>
+              </div>
+            </CardAction>
           </CardHeader>
           <CardContent>
             <Suspense
@@ -189,28 +211,6 @@ export default function HomeClient() {
           <CardHeader>
             <CardTitle>Preview</CardTitle>
             <CardDescription>Live preview of your resume</CardDescription>
-            <CardAction>
-              <div className="flex gap-1" role="group" aria-label="Resume style">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant={resumeStyle === "code" ? "default" : "outline"}
-                  aria-pressed={resumeStyle === "code"}
-                  onClick={() => selectStyle("code")}
-                >
-                  Code
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant={resumeStyle === "harvard" ? "default" : "outline"}
-                  aria-pressed={resumeStyle === "harvard"}
-                  onClick={() => selectStyle("harvard")}
-                >
-                  Harvard
-                </Button>
-              </div>
-            </CardAction>
           </CardHeader>
           <CardContent className="p-0 md:p-6">
             <div className="overflow-x-auto overflow-y-auto max-h-[400px] md:max-h-[800px]">

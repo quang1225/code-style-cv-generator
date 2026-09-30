@@ -57,7 +57,7 @@ const RESUME_CSS = (cssVars: string) => `
   }
   .resume-rich-text {
     font-size: 11px;
-    line-height: 1.625;
+    line-height: 1.4;
     color: var(--resume-body-text);
     overflow-wrap: break-word;
     word-wrap: break-word;
@@ -70,8 +70,8 @@ const RESUME_CSS = (cssVars: string) => `
   .resume-rich-text em { font-style: italic; }
   .resume-rich-text p { margin: 0; padding: 0; display: block; }
   .resume-rich-text p:not(:first-child) { margin-top: 0.5em; }
-  .resume-rich-text .resume-project-block { line-height: 1.3; }
-  .resume-rich-text .resume-project-block p + p { margin-top: 0; }
+  .resume-rich-text .resume-project-block { line-height: 1.4; }
+  .resume-rich-text .resume-project-block p + p { margin-top: 0.1em; }
   .resume-rich-text p:empty,
   .resume-rich-text p:has(br:only-child) { min-height: 1em; }
   .resume-rich-text br { display: block; margin: 0.25em 0; }
@@ -234,6 +234,17 @@ const HARVARD_CSS = `
   }
   .harvard-copyright { text-align: center; font-size: 9px; color: #666666; margin-bottom: 10px; }
   .harvard-copyright a { color: inherit; text-decoration: underline; }
+  .harvard-header.has-avatar {
+    display: grid;
+    grid-template-columns: 78px 1fr 78px;
+    align-items: center;
+    column-gap: 16px;
+  }
+  .harvard-avatar {
+    width: 78px; height: 78px; object-fit: cover; display: block;
+    border: 1px solid #000000;
+  }
+  .harvard-identity { grid-column: 2; min-width: 0; }
   .harvard-name { text-align: center; font-size: 20pt; font-weight: 700; margin: 0; letter-spacing: 0.03em; }
   .harvard-title { text-align: center; font-size: 11pt; margin: 2px 0 0; }
   .harvard-contact { text-align: center; font-size: 10.5pt; margin: 4px 0 0; }
@@ -301,6 +312,7 @@ function harvardResumeHtml(data: ResumeData): string {
     .filter((part) => part && part.trim())
     .map((part) => escapeHtml(part))
     .join(" · ");
+  const avatar = data.avatar?.trim() ?? "";
 
   const sections: string[] = [];
   if (hasRichText(data.summary)) {
@@ -367,9 +379,14 @@ function harvardResumeHtml(data: ResumeData): string {
         ? `<div class="harvard-copyright">CV made with <a href="https://code-style-cv-generator.quang.work">https://code-style-cv-generator.quang.work</a></div>`
         : ""
     }
-    <h1 class="harvard-name">${escapeHtml(data.name)}</h1>
-    ${data.title?.trim() ? `<p class="harvard-title">${escapeHtml(data.title)}</p>` : ""}
-    ${contact ? `<p class="harvard-contact">${contact}</p>` : ""}
+    <header class="harvard-header${avatar ? " has-avatar" : ""}">
+      ${avatar ? `<img class="harvard-avatar" src="${avatar}" alt="Profile">` : ""}
+      <div class="harvard-identity">
+        <h1 class="harvard-name">${escapeHtml(data.name)}</h1>
+        ${data.title?.trim() ? `<p class="harvard-title">${escapeHtml(data.title)}</p>` : ""}
+        ${contact ? `<p class="harvard-contact">${contact}</p>` : ""}
+      </div>
+    </header>
     ${sections.join("")}
   </div>
 </body>
@@ -403,7 +420,7 @@ export function resumeToHtml(
             <span class="text-red font-semibold">🏢 ${escapeHtml(job.company)}</span>
           </p>
         </div>
-        <div class="resume-rich-text text-gray-300" style="font-size: 11px; line-height: 1.625;">
+        <div class="resume-rich-text text-gray-300" style="font-size: 11px; line-height: 1.4;">
           ${formatContent(job.description)}
         </div>
       </div>
@@ -427,7 +444,7 @@ export function resumeToHtml(
                   ${item.period ? `<span class="period text-purple">${escapeHtml(item.period)}</span>` : ""}
                 </div>
               </div>
-              ${item.description ? `<div class="resume-rich-text text-gray-300" style="font-size: 11px; line-height: 1.625;">${formatContent(item.description)}</div>` : ""}
+              ${item.description ? `<div class="resume-rich-text text-gray-300" style="font-size: 11px; line-height: 1.4;">${formatContent(item.description)}</div>` : ""}
             </div>
           `,
             )
@@ -501,7 +518,7 @@ export function resumeToHtml(
         <div class="flex min-w-0 space-y-4" style="flex: 4; flex-direction: column;">
           <section>
             <h2 class="text-orange font-bold mb-2" style="font-size: 14px;">/summary</h2>
-            <div class="resume-rich-text text-gray-300" style="font-size: 11px; line-height: 1.625;">
+            <div class="resume-rich-text text-gray-300" style="font-size: 11px; line-height: 1.4;">
               ${formatContent(data.summary)}
             </div>
           </section>

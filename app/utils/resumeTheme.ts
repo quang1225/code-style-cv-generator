@@ -1,5 +1,7 @@
 export type ResumeThemeId = "light" | "dark";
 
+export type ResumeStyleId = "code" | "harvard";
+
 export type ResumeThemeTokens = {
   pageBg: string;
   text: string;
@@ -49,6 +51,10 @@ export const resumeThemes = {
 
 export function normalizeResumeTheme(value: unknown): ResumeThemeId {
   return value === "dark" ? "dark" : "light";
+}
+
+export function normalizeResumeStyle(value: unknown): ResumeStyleId {
+  return value === "harvard" ? "harvard" : "code";
 }
 
 export function getResumeTheme(id?: ResumeThemeId): ResumeThemeTokens {

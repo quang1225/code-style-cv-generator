@@ -7,6 +7,7 @@ import {
 import { RESUME_FONT_FAMILY_PDF } from "./resumeFontFamily";
 import {
   getResumeTheme,
+  normalizeResumeStyle,
   normalizeResumeTheme,
   toResumeCssText,
 } from "./resumeTheme";
@@ -156,7 +157,169 @@ function formatContent(text: string): string {
     .replace(/<br>\s*<br>/gi, `<br>${LINE_BREAK_SPACER}<br>`);
 }
 
-export function resumeToHtml(data: ResumeData, theme?: unknown): string {
+function hasRichText(text: string | undefined): boolean {
+  if (!text) return false;
+  const plain = text
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/\u00a0/g, " ")
+    .trim();
+  return plain.length > 0;
+}
+
+const HARVARD_CSS = `
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  html, body { margin: 0; padding: 0; background: #ffffff; color: #000000; font-family: "Source Serif 4", "Times New Roman", Times, serif; }
+  @page { size: A4; margin: 0; }
+  .pdf-bg { position: fixed; inset: 0; background: #ffffff; z-index: -1; }
+  #resume-content {
+    width: 794px; min-height: 1122px; max-width: 100%;
+    padding: 48px 58px; background: #ffffff; color: #000000;
+    font-size: 11pt; line-height: 1.5;
+    overflow-wrap: break-word; word-wrap: break-word;
+    -webkit-hyphens: none; hyphens: none;
+  }
+  .harvard-copyright { text-align: center; font-size: 9px; color: #666666; margin-bottom: 10px; }
+  .harvard-copyright a { color: inherit; text-decoration: underline; }
+  .harvard-name { text-align: center; font-size: 20pt; font-weight: 700; margin: 0; letter-spacing: 0.03em; }
+  .harvard-title { text-align: center; font-size: 11pt; margin: 2px 0 0; }
+  .harvard-contact { text-align: center; font-size: 10.5pt; margin: 4px 0 0; }
+  .harvard-section { margin-top: 14px; }
+  .harvard-section h2 {
+    font-size: 11pt; font-weight: 700; letter-spacing: 0.08em;
+    border-bottom: 1px solid #000000; margin: 0 0 6px; padding-bottom: 1px;
+  }
+  .harvard-entry { margin-bottom: 12px; }
+  .harvard-entry:last-child { margin-bottom: 0; }
+  .harvard-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .harvard-row .left { font-weight: 700; min-width: 0; }
+  .harvard-row .right { flex-shrink: 0; white-space: nowrap; }
+  .harvard-position { font-style: italic; margin: 2px 0 0; }
+  .resume-rich-text { font-size: 11pt; line-height: 1.5; color: #000000; margin-top: 4px; }
+  .resume-rich-text strong { font-weight: 700; }
+  .resume-rich-text em { font-style: italic; }
+  .resume-rich-text p { margin: 0; }
+  .resume-rich-text p:not(:first-child) { margin-top: 0.6em; }
+  .resume-rich-text ul, .resume-rich-text ol { margin: 4px 0 0; padding-left: 1.2em; }
+  .resume-rich-text li { margin: 0.15em 0; }
+  .resume-rich-text a { color: #000000; text-decoration: underline; }
+  html[data-resume-style="harvard"] .resume-rich-text,
+  html[data-resume-style="harvard"] .resume-rich-text * {
+    color: #000000 !important;
+    background-color: transparent !important;
+  }
+  html[data-resume-style="harvard"] .resume-rich-text a { color: #000000 !important; }
+`;
+
+function harvardEntry(
+  left: string,
+  period: string,
+  sub: string,
+  description: string,
+): string {
+  const row =
+    left || period
+      ? `<div class="harvard-row"><span class="left">${left}</span><span class="right">${period}</span></div>`
+      : "";
+  const subLine = sub ? `<p class="harvard-position">${sub}</p>` : "";
+  const body = hasRichText(description)
+    ? `<div class="resume-rich-text">${formatContent(description)}</div>`
+    : "";
+  return `<div class="harvard-entry">${row}${subLine}${body}</div>`;
+}
+
+function harvardSection(title: string, body: string): string {
+  return `<section class="harvard-section"><h2>${escapeHtml(title)}</h2>${body}</section>`;
+}
+
+function harvardResumeHtml(data: ResumeData): string {
+  const contact = [data.phone, data.email, data.location]
+    .filter((part) => part && part.trim())
+    .map((part) => escapeHtml(part))
+    .join(" · ");
+
+  const sections: string[] = [];
+  if (hasRichText(data.summary)) {
+    sections.push(
+      harvardSection(
+        "SUMMARY",
+        `<div class="resume-rich-text">${formatContent(data.summary)}</div>`,
+      ),
+    );
+  }
+
+  const jobs = data.workExperience ?? [];
+  if (jobs.length > 0) {
+    sections.push(
+      harvardSection(
+        "EXPERIENCE",
+        jobs
+          .map((job) =>
+            harvardEntry(
+              escapeHtml(job.company),
+              escapeHtml(job.period),
+              escapeHtml(job.position),
+              job.description,
+            ),
+          )
+          .join(""),
+      ),
+    );
+  }
+
+  for (const section of data.customSections ?? []) {
+    const items = (section.items ?? [])
+      .map((item) =>
+        harvardEntry(
+          escapeHtml(item.title),
+          escapeHtml(item.period),
+          "",
+          item.description,
+        ),
+      )
+      .join("");
+    if (!items) continue;
+    sections.push(harvardSection(section.title.toUpperCase(), items));
+  }
+
+  return `
+<!DOCTYPE html>
+<html lang="en" data-resume-style="harvard">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=794">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&amp;display=swap" rel="stylesheet">
+  <style>${HARVARD_CSS}</style>
+</head>
+<body>
+  <div class="pdf-bg" aria-hidden="true"></div>
+  <div id="resume-content" data-resume-style="harvard">
+    ${
+      data.showCopyright
+        ? `<div class="harvard-copyright">CV made with <a href="https://code-style-cv-generator.quang.work">https://code-style-cv-generator.quang.work</a></div>`
+        : ""
+    }
+    <h1 class="harvard-name">${escapeHtml(data.name)}</h1>
+    ${data.title?.trim() ? `<p class="harvard-title">${escapeHtml(data.title)}</p>` : ""}
+    ${contact ? `<p class="harvard-contact">${contact}</p>` : ""}
+    ${sections.join("")}
+  </div>
+</body>
+</html>
+  `.trim();
+}
+
+export function resumeToHtml(
+  data: ResumeData,
+  theme?: unknown,
+  style?: unknown,
+): string {
+  if (normalizeResumeStyle(style) === "harvard") {
+    return harvardResumeHtml(data);
+  }
+
   const resumeTheme = normalizeResumeTheme(theme);
   const tokens = getResumeTheme(resumeTheme);
   const cssVars = toResumeCssText(tokens);

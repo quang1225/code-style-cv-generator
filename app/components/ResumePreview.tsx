@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import { useTheme } from "next-themes";
 import { ResumeData } from "../types/resume";
 import {
@@ -9,14 +9,51 @@ import {
   preventHyphenBreaksInHtml,
 } from "../utils/preserveHyphenBreaks";
 import { RESUME_FONT_FAMILY_PREVIEW } from "../utils/resumeFontFamily";
+import { resumeToHtml } from "../utils/resumeToHtml";
 import {
   getResumeTheme,
   normalizeResumeTheme,
   toResumeCssVarMap,
+  type ResumeStyleId,
 } from "../utils/resumeTheme";
 
 interface ResumePreviewProps {
   data: ResumeData;
+  style?: ResumeStyleId;
+}
+
+function HarvardPreview({ data }: { data: ResumeData }) {
+  const html = resumeToHtml(data, "light", "harvard");
+  const frameRef = useRef<HTMLIFrameElement>(null);
+  const [height, setHeight] = useState(1122);
+
+  const syncHeight = useCallback(() => {
+    const doc = frameRef.current?.contentDocument;
+    const content = doc?.getElementById("resume-content");
+    const next = content?.scrollHeight ?? doc?.body?.scrollHeight ?? 1122;
+    setHeight(Math.max(next, 1122));
+  }, []);
+
+  return (
+    <div className="w-fit">
+      <iframe
+        ref={frameRef}
+        title="Harvard resume preview"
+        srcDoc={html}
+        onLoad={syncHeight}
+        style={{
+          width: 794,
+          height,
+          border: 0,
+          display: "block",
+          background: "#ffffff",
+          borderRadius: 8,
+          boxShadow:
+            "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+        }}
+      />
+    </div>
+  );
 }
 
 /*
@@ -27,7 +64,7 @@ When changing layout or styles here, update resumeToHtml.ts to match
 so the exported PDF stays consistent with the preview.
 */
 
-const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
+const CodeResumePreview: React.FC<{ data: ResumeData }> = React.memo(({ data }) => {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -470,6 +507,11 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
   );
 });
 
-ResumePreview.displayName = "ResumePreview";
+CodeResumePreview.displayName = "CodeResumePreview";
+
+const ResumePreview: React.FC<ResumePreviewProps> = ({ data, style = "code" }) => {
+  if (style === "harvard") return <HarvardPreview data={data} />;
+  return <CodeResumePreview data={data} />;
+};
 
 export default ResumePreview;

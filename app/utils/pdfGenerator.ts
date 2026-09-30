@@ -1,10 +1,11 @@
 import { ResumeData } from "../types/resume";
 import { buildPdfFilename } from "./pdfFilename";
-import type { ResumeThemeId } from "./resumeTheme";
+import type { ResumeStyleId, ResumeThemeId } from "./resumeTheme";
 
 export const generatePDF = async (
   data: ResumeData,
   theme: ResumeThemeId,
+  style: ResumeStyleId,
 ): Promise<{
   success: boolean;
   message: string;
@@ -13,7 +14,7 @@ export const generatePDF = async (
     const response = await fetch("/api/generate-pdf", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ resumeData: data, theme }),
+      body: JSON.stringify({ resumeData: data, theme, style }),
     });
 
     if (!response.ok) {

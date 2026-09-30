@@ -4,11 +4,14 @@ import { useState, useCallback, useEffect, lazy, Suspense } from "react";
 import { useTheme } from "next-themes";
 import { ResumeData } from "../types/resume";
 import {
+  normalizeResumeStyle,
   normalizeResumeTheme,
+  type ResumeStyleId,
   type ResumeThemeId,
 } from "../utils/resumeTheme";
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -26,6 +29,7 @@ const ResumeForm = lazy(() => import("./ResumeForm"));
 function PdfButton({
   resumeData,
   theme,
+  style,
   themeReady,
   isGeneratingPDF,
   onStatusChange,
@@ -33,6 +37,7 @@ function PdfButton({
 }: {
   resumeData: ResumeData;
   theme: ResumeThemeId | null;
+  style: ResumeStyleId;
   themeReady: boolean;
   isGeneratingPDF: boolean;
   onStatusChange: (status: {
@@ -47,7 +52,7 @@ function PdfButton({
       onGeneratingChange(true);
       onStatusChange({ type: null, message: "" });
       const { generatePDF } = await import("../utils/pdfGenerator");
-      const result = await generatePDF(resumeData, theme);
+      const result = await generatePDF(resumeData, theme, style);
       onStatusChange({
         type: result.success ? "success" : "error",
         message: result.message,
@@ -62,7 +67,7 @@ function PdfButton({
     } finally {
       onGeneratingChange(false);
     }
-  }, [resumeData, theme, themeReady, onStatusChange, onGeneratingChange]);
+  }, [resumeData, theme, style, themeReady, onStatusChange, onGeneratingChange]);
 
   return (
     <Button
@@ -95,6 +100,7 @@ export default function HomeClient() {
   const [resumeData, setResumeData] = useState<ResumeData>(
     defaultResumeData as ResumeData
   );
+  const [resumeStyle, setResumeStyle] = useState<ResumeStyleId>("code");
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [pdfStatus, setPdfStatus] = useState<{
     type: "success" | "error" | null;
@@ -102,7 +108,13 @@ export default function HomeClient() {
   }>({ type: null, message: "" });
 
   useEffect(() => {
+    setResumeStyle(normalizeResumeStyle(localStorage.getItem("resumeStyle")));
     setMounted(true);
+  }, []);
+
+  const selectStyle = useCallback((next: ResumeStyleId) => {
+    setResumeStyle(next);
+    localStorage.setItem("resumeStyle", next);
   }, []);
 
   const themeReady = mounted && resolvedTheme != null;
@@ -161,6 +173,7 @@ export default function HomeClient() {
               <PdfButton
                 resumeData={resumeData}
                 theme={resumeTheme}
+                style={resumeStyle}
                 themeReady={themeReady}
                 isGeneratingPDF={isGeneratingPDF}
                 onStatusChange={setPdfStatus}
@@ -176,18 +189,44 @@ export default function HomeClient() {
           <CardHeader>
             <CardTitle>Preview</CardTitle>
             <CardDescription>Live preview of your resume</CardDescription>
+            <CardAction>
+              <div className="flex gap-1" role="group" aria-label="Resume style">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={resumeStyle === "code" ? "default" : "outline"}
+                  aria-pressed={resumeStyle === "code"}
+                  onClick={() => selectStyle("code")}
+                >
+                  Code
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={resumeStyle === "harvard" ? "default" : "outline"}
+                  aria-pressed={resumeStyle === "harvard"}
+                  onClick={() => selectStyle("harvard")}
+                >
+                  Harvard
+                </Button>
+              </div>
+            </CardAction>
           </CardHeader>
           <CardContent className="p-0 md:p-6">
             <div className="overflow-x-auto overflow-y-auto max-h-[400px] md:max-h-[800px]">
               <div className="w-full md:w-auto">
                 <div className="transform scale-[0.47] sm:scale-[0.6] md:scale-100 origin-top-left w-fit md:w-full h-[527px] sm:h-[673px] md:h-auto">
-                  <Suspense
-                    fallback={
-                      <div className="w-[794px] min-h-[400px] bg-muted rounded-lg animate-pulse" />
-                    }
-                  >
-                    <ResumePreview data={resumeData} />
-                  </Suspense>
+                  {mounted ? (
+                    <Suspense
+                      fallback={
+                        <div className="w-[794px] min-h-[400px] bg-muted rounded-lg animate-pulse" />
+                      }
+                    >
+                      <ResumePreview data={resumeData} style={resumeStyle} />
+                    </Suspense>
+                  ) : (
+                    <div className="w-[794px] min-h-[400px] bg-muted rounded-lg animate-pulse" />
+                  )}
                 </div>
               </div>
             </div>

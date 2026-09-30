@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { ResumeData } from "@/app/types/resume";
 import { buildPdfFilename } from "@/app/utils/pdfFilename";
 import { resumeToHtml } from "@/app/utils/resumeToHtml";
-import { normalizeResumeTheme } from "@/app/utils/resumeTheme";
+import {
+  normalizeResumeStyle,
+  normalizeResumeTheme,
+} from "@/app/utils/resumeTheme";
 
 export const maxDuration = 60;
 
@@ -55,7 +58,8 @@ export async function POST(request: NextRequest) {
       );
     }
     const theme = normalizeResumeTheme(body?.theme);
-    const html = resumeToHtml(resumeData, theme);
+    const style = normalizeResumeStyle(body?.style);
+    const html = resumeToHtml(resumeData, theme, style);
 
     const browser = await launchBrowser();
 

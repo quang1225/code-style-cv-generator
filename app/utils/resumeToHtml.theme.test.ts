@@ -45,4 +45,47 @@ describe("resumeToHtml theme", () => {
     );
     expect(html).toContain("color: inherit !important");
   });
+
+  it("omitted style stays on the code layout", () => {
+    const html = resumeToHtml(minimal, "dark");
+    expect(html).toContain("/work experience");
+    expect(html).toContain("Roboto Mono");
+    expect(html).not.toContain('data-resume-style="harvard"');
+  });
+
+  it("harvard style is serif black and white without code chrome", () => {
+    const html = resumeToHtml(
+      {
+        ...minimal,
+        phone: "0900",
+        email: "a@b.c",
+        location: "Hanoi",
+        gender: "M",
+        avatar: "data:image/png;base64,xx",
+        summary: "Builds things",
+        workExperience: [
+          {
+            position: "Engineer",
+            company: "Acme",
+            period: "2020",
+            description: '<span style="color:#ff0000">Shipped</span>',
+          },
+        ],
+      },
+      "dark",
+      "harvard",
+    );
+    expect(html).toContain('data-resume-style="harvard"');
+    expect(html).toContain("Source Serif 4");
+    expect(html).toContain("#000000");
+    expect(html).toContain(">SUMMARY<");
+    expect(html).toContain(">EXPERIENCE<");
+    expect(html).toContain("Acme");
+    expect(html).toContain("0900 · a@b.c · Hanoi");
+    expect(html).not.toContain("🏢");
+    expect(html).not.toContain("data:image");
+    expect(html).not.toContain("#2d3748");
+    expect(html).not.toContain("#4fd1c7");
+    expect(html).not.toContain("Gender");
+  });
 });

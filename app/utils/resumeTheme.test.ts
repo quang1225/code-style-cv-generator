@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   getResumeTheme,
+  normalizeResumeStyle,
   normalizeResumeTheme,
   resumeThemes,
   toResumeCssText,
@@ -18,6 +19,18 @@ describe("normalizeResumeTheme", () => {
     expect(normalizeResumeTheme(undefined)).toBe("light");
     expect(normalizeResumeTheme(null)).toBe("light");
     expect(normalizeResumeTheme("nope")).toBe("light");
+  });
+});
+
+describe("normalizeResumeStyle", () => {
+  it('returns "harvard" only for "harvard"', () => {
+    expect(normalizeResumeStyle("harvard")).toBe("harvard");
+  });
+
+  it('returns "code" for omitted and garbage values', () => {
+    expect(normalizeResumeStyle(undefined)).toBe("code");
+    expect(normalizeResumeStyle("light")).toBe("code");
+    expect(normalizeResumeStyle("nope")).toBe("code");
   });
 });
 
